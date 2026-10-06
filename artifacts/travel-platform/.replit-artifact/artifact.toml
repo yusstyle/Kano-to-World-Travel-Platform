@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "From Kano to the World"
+description = "A premium travel discovery and booking platform connecting travelers with cultural, heritage, and adventure experiences starting in Kano and expanding worldwide."
+version = "1.0.0"
+id = "artifacts/travel-platform"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23676
+
+[services.development]
+run = "pnpm --filter @workspace/travel-platform run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/travel-platform", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/travel-platform/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23676"
+BASE_PATH = "/"

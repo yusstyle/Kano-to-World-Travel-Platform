@@ -1,0 +1,631 @@
+==================================================
+PHASED IMPLEMENTATION PLAN
+==========================
+
+IMPORTANT:
+
+Do NOT attempt to build the entire platform blindly in one pass.
+
+Build the application in clearly defined phases.
+
+After completing each phase:
+
+1. Run the application.
+2. Check for TypeScript/build errors.
+3. Check the browser console.
+4. Check backend errors.
+5. Test the functionality created in that phase.
+6. Fix problems before moving to the next phase.
+7. Preserve all working functionality from previous phases.
+
+Do not move forward while a critical feature from the current phase is broken.
+
+==================================================
+PHASE 0 — PROJECT INSPECTION & ARCHITECTURE
+===========================================
+
+First inspect the existing Replit project.
+
+Determine:
+
+* Current framework
+* Current package manager
+* Existing frontend
+* Existing backend
+* Existing database
+* Existing environment variables
+* Existing routes
+* Existing components
+* Existing authentication
+* Existing reusable code
+
+Do not destroy useful existing code.
+
+Create a clear implementation plan based on the actual project.
+
+Then establish the final architecture.
+
+Deliverables:
+
+* Project structure
+* Database architecture
+* API architecture
+* Authentication architecture
+* Design system
+* Environment variable structure
+
+==================================================
+PHASE 1 — BRAND FOUNDATION & DESIGN SYSTEM
+==========================================
+
+Build the visual foundation.
+
+Create:
+
+* Global typography
+* Color system
+* Spacing system
+* Buttons
+* Inputs
+* Selects
+* Cards
+* Modals
+* Badges
+* Alerts
+* Toasts
+* Navigation
+* Footer
+* Loading states
+* Empty states
+* Error states
+
+Create the responsive layout.
+
+Build:
+
+* Desktop navigation
+* Tablet navigation
+* Mobile navigation
+* Footer
+
+Implement the premium travel visual identity.
+
+Do not build all business functionality yet.
+
+Test the design at:
+
+360px
+390px
+414px
+768px
+1024px
+1440px
+1920px
+
+==================================================
+PHASE 2 — DATABASE & BACKEND FOUNDATION
+=======================================
+
+Set up PostgreSQL.
+
+Implement:
+
+* Drizzle ORM
+* Schema
+* Migrations
+* Relationships
+* Indexes
+* Constraints
+
+Create core models:
+
+users
+roles
+permissions
+customers
+destinations
+tours
+tour_images
+tour_categories
+tour_itineraries
+tour_availability
+tour_addons
+bookings
+booking_items
+payments
+guides
+reviews
+testimonials
+blog_posts
+blog_categories
+gallery_images
+faqs
+contact_inquiries
+newsletter_subscribers
+site_settings
+audit_logs
+
+Create seed data.
+
+Run migrations successfully.
+
+Verify database connectivity.
+
+==================================================
+PHASE 3 — AUTHENTICATION & AUTHORIZATION
+========================================
+
+Implement:
+
+Customer registration
+Customer login
+Logout
+Forgot password
+Reset password
+Session management
+Password hashing
+
+Implement roles:
+
+Super Admin
+Admin
+Tour Manager
+Content Manager
+Guide
+Support Staff
+Customer
+
+Implement backend authorization.
+
+Test that users cannot access resources outside their permissions.
+
+==================================================
+PHASE 4 — PUBLIC WEBSITE
+========================
+
+Build the public-facing website.
+
+Create:
+
+Homepage
+Tours
+Tour details
+Destinations
+Destination details
+Experiences
+About
+Founder
+Gallery
+Blog
+Blog article
+FAQ
+Contact
+
+Connect content to the database where appropriate.
+
+Do not leave important pages as static fake placeholders.
+
+==================================================
+PHASE 5 — TOUR & DESTINATION CMS
+================================
+
+Build the admin CMS for:
+
+Tours
+Destinations
+Categories
+Itineraries
+Availability
+Add-ons
+Images
+
+Admin must be able to:
+
+Create
+Edit
+Delete
+Publish
+Unpublish
+Feature
+Reorder
+
+Verify that changes made in the admin dashboard appear correctly on the public website.
+
+==================================================
+PHASE 6 — BOOKING ENGINE
+========================
+
+Build the complete booking flow.
+
+Customer:
+
+1. Select tour
+2. Select date
+3. Select travelers
+4. Select options
+5. Enter customer details
+6. Review
+7. Submit booking
+
+Generate booking reference.
+
+Implement booking status management.
+
+Test:
+
+Valid booking
+Invalid booking
+Unavailable date
+Different traveler counts
+Duplicate submissions
+Cancellation
+
+==================================================
+PHASE 7 — PAYMENT SYSTEM
+========================
+
+Implement Paystack architecture.
+
+Create:
+
+Payment initialization
+Payment verification
+Webhook handling
+Payment records
+Payment statuses
+
+IMPORTANT:
+
+Payment must be verified server-side.
+
+Never trust frontend payment success.
+
+Implement development/mock payment mode only when real credentials are unavailable.
+
+Clearly separate development payment mode from production payment mode.
+
+Test:
+
+Successful payment
+Failed payment
+Cancelled payment
+Webhook
+Duplicate webhook
+Invalid webhook
+Already-paid booking
+
+==================================================
+PHASE 8 — CUSTOMER DASHBOARD
+============================
+
+Build:
+
+Profile
+My bookings
+Booking details
+Payment status
+Cancellation
+Confirmation download
+Support/contact
+
+Connect dashboard to real database records.
+
+Test customer isolation.
+
+Customer A must never see Customer B's bookings.
+
+==================================================
+PHASE 9 — ADMIN DASHBOARD
+=========================
+
+Build professional admin dashboard.
+
+Dashboard:
+
+Revenue
+Bookings
+Customers
+Tours
+Destinations
+Upcoming trips
+Inquiries
+
+Build management interfaces for:
+
+Bookings
+Customers
+Tours
+Destinations
+Guides
+Blog
+Gallery
+Testimonials
+FAQs
+Payments
+Inquiries
+Newsletter
+Users
+Settings
+Audit Logs
+
+Every important admin action should be properly authorized.
+
+==================================================
+PHASE 10 — CONTENT & MARKETING SYSTEM
+=====================================
+
+Implement:
+
+Blog CMS
+Gallery CMS
+Testimonials
+FAQs
+Homepage CMS
+Founder content
+SEO settings
+Newsletter
+
+Allow non-technical administrators to update website content without editing code.
+
+==================================================
+PHASE 11 — EMAIL & COMMUNICATION
+================================
+
+Implement transactional emails.
+
+Test:
+
+Registration
+Password reset
+Booking received
+Payment successful
+Booking confirmed
+Booking cancelled
+Contact form
+Admin notifications
+
+Create branded email templates.
+
+==================================================
+PHASE 12 — SEO & DISCOVERABILITY
+================================
+
+Implement:
+
+Dynamic page titles
+Meta descriptions
+Canonical URLs
+Open Graph
+Twitter/X metadata
+Sitemap
+Robots.txt
+Structured data
+Breadcrumbs
+
+Verify SEO for:
+
+Homepage
+Tours
+Tour details
+Destinations
+Destination details
+Blog
+Blog articles
+
+==================================================
+PHASE 13 — PERFORMANCE & ACCESSIBILITY
+======================================
+
+Optimize:
+
+Images
+Bundles
+Database queries
+Caching
+Lazy loading
+Code splitting
+
+Run accessibility checks.
+
+Fix:
+
+Missing labels
+Poor contrast
+Keyboard navigation
+Missing alt text
+Focus issues
+Mobile layout problems
+
+==================================================
+PHASE 14 — SECURITY AUDIT
+=========================
+
+Perform a security review.
+
+Check:
+
+Authentication
+Authorization
+Password storage
+Sessions
+Cookies
+CSRF
+XSS
+SQL injection
+Rate limiting
+File uploads
+API validation
+Payment webhooks
+Environment variables
+Admin permissions
+
+Remove:
+
+Hardcoded secrets
+Test passwords
+Debug credentials
+Fake production integrations
+
+==================================================
+PHASE 15 — FULL SYSTEM TEST
+===========================
+
+Perform an end-to-end test.
+
+Test this complete journey:
+
+Visitor
+→ Homepage
+→ Tour
+→ Tour details
+→ Select date
+→ Select travelers
+→ Booking
+→ Payment
+→ Confirmation
+→ Customer dashboard
+
+Then test:
+
+Admin login
+→ Dashboard
+→ Booking
+→ Customer
+→ Tour management
+→ Destination management
+→ Content management
+→ Settings
+
+==================================================
+PHASE 16 — MOBILE & CROSS-SCREEN QA
+===================================
+
+Test the entire platform on:
+
+360px
+390px
+414px
+768px
+1024px
+1440px
+1920px
+
+Pay particular attention to:
+
+Navigation
+Hero
+Tour cards
+Booking forms
+Checkout
+Admin tables
+Dashboard
+Gallery
+Blog
+Footer
+
+Fix overflow and layout problems.
+
+==================================================
+PHASE 17 — PRODUCTION READINESS
+===============================
+
+Prepare for production deployment.
+
+Verify:
+
+Production build
+Environment variables
+Database migrations
+Database connection
+Payment configuration
+Email configuration
+Image storage
+Domain configuration
+HTTPS
+Error handling
+Logging
+SEO
+Sitemap
+Robots.txt
+
+Create final deployment documentation.
+
+==================================================
+PHASE 18 — FINAL BUSINESS HANDOFF
+=================================
+
+At the end, produce a concise handoff report containing:
+
+A. Completed features
+
+B. Database tables
+
+C. API endpoints
+
+D. Admin features
+
+E. Customer features
+
+F. Required environment variables
+
+G. External services that need configuration
+
+H. Business information that still needs to be supplied
+
+I. Known limitations
+
+J. Recommended next steps
+
+==================================================
+IMPORTANT PHASE RULE
+====================
+
+Do not skip phases simply because the code appears to compile.
+
+A phase is complete only when:
+
+* It builds
+* It runs
+* Its main functionality works
+* It has been tested
+* Critical errors are fixed
+* It does not break previous phases
+
+Do not hide unfinished functionality behind buttons that appear to work.
+
+Do not create fake success messages for functionality that is not implemented.
+
+If an external integration cannot be completed because credentials are missing, clearly identify it as "configuration required" and implement everything that can safely be implemented without the credentials.
+
+At the end of every phase, briefly report:
+
+PHASE STATUS
+
+* Completed:
+* Tested:
+* Issues found:
+* Issues fixed:
+* Remaining configuration:
+
+Then continue to the next phase.
+
+==================================================
+FINAL STANDARD
+==============
+
+The goal is not simply to finish a website.
+
+The goal is to build the foundation of a real international tourism company that can start in Kano, expand throughout Nigeria and Africa, and eventually operate worldwide.
+
+Prioritize:
+
+1. Correctness
+2. Security
+3. Real functionality
+4. Professional UX
+5. Scalability
+6. Performance
+7. Maintainability
+8. Premium visual quality
+
+Never sacrifice security or correctness simply to make the project appear finished.

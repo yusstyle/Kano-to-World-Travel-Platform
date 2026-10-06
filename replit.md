@@ -1,10 +1,10 @@
-# [Project name]
+# From Kano to the World
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An international cultural-travel platform rooted in Kano, Nigeria, for discovering history, heritage, and travel experiences.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -18,27 +18,38 @@ _Replace the heading above with the project's name, and this line with one sente
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Build: esbuild (ESM bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/travel-platform` — public React + Vite travel website
+- `artifacts/api-server` — shared Express API
+- `lib/api-spec/openapi.yaml` — API contract source of truth
+- `lib/db/src/schema` — Drizzle database schema
+- `artifacts/api-server/src/seed.ts` — illustrative development content
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Tour and destination examples are demo content, are not for sale, and must not imply dates or prices are confirmed.
+- Only business facts supplied or confirmed by the owner may be presented as real; do not invent awards, partners, reviews, qualifications, locations, or contact channels.
+- Contact inquiries and newsletter subscriptions are stored in PostgreSQL; email delivery is not configured yet.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The current public site supports tour and destination discovery, tour filtering and details, founder information, contact inquiries, and newsletter subscriptions. Customer accounts, booking, payments, and the admin CMS remain future implementation phases.
+
+The founder is a Kano-based cultural/history professional with professional experience at the Kano Museum, sharing Kano's history and heritage with visitors. The founder's name, full biography, and photo have not been supplied.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Build in verified phases rather than presenting unfinished functionality as complete.
+- Keep demo content clearly labeled and do not invent real business information.
+- Prioritize a premium, culturally grounded, responsive travel experience.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Payment credentials, transactional email, real schedules/prices, and company contact/social details have not been configured.
+- Use the generated API client and Zod schemas from the OpenAPI contract when adding frontend/backend endpoints.
 
 ## Pointers
 

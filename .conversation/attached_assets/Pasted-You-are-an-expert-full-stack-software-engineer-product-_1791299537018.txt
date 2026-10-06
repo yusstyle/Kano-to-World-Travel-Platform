@@ -1,0 +1,1522 @@
+You are an expert full-stack software engineer, product architect, premium UI/UX designer, travel-platform developer, database engineer, security engineer, SEO specialist, and SaaS product designer.
+
+I want you to BUILD a complete, production-quality international tourism and travel experience website/platform.
+
+Do not just create a landing page.
+Do not only create a frontend mockup.
+Do not give me a tutorial.
+Do not stop after creating the homepage.
+
+BUILD THE ACTUAL WORKING APPLICATION.
+
+The final product must look like a serious international tourism company — premium, trustworthy, modern, cinematic, elegant, responsive, fast, secure, and scalable.
+
+==================================================
+PROJECT CONCEPT
+===============
+
+This business is founded by a professional cultural/history worker based in Kano, Nigeria who has professional experience at the Kano Museum, where he shares and explains the history, heritage, culture, and stories of Kano to visitors.
+
+However, this business is NOT supposed to be only a Kano tour website.
+
+The vision is:
+
+FROM KANO TO THE WORLD.
+
+The company should offer:
+
+* Kano tours
+* Northern Nigeria tours
+* Nigeria tours
+* African tours
+* International tours
+* Historical tours
+* Heritage tours
+* Cultural experiences
+* Museum tours
+* Food experiences
+* Photography experiences
+* Family tours
+* Private tours
+* Group tours
+* Educational tours
+* Corporate/group experiences
+* Custom travel experiences
+
+The founder's historical and cultural knowledge should be a major competitive advantage.
+
+The company should eventually be able to work with local guides and travel partners in different countries.
+
+==================================================
+CORE BRAND MESSAGE
+==================
+
+Primary tagline:
+
+"Discover the World. Experience Its Story."
+
+Secondary brand message:
+
+"From Kano to the World."
+
+The brand should communicate:
+
+AUTHENTICITY
+CULTURE
+HISTORY
+DISCOVERY
+TRUST
+PROFESSIONALISM
+ADVENTURE
+PREMIUM EXPERIENCE
+
+Do not make the company look like a cheap travel agency.
+
+==================================================
+VERY IMPORTANT CONTENT RULE
+===========================
+
+DO NOT INVENT REAL BUSINESS INFORMATION.
+
+Do not fabricate:
+
+* awards
+* certifications
+* government approvals
+* partnerships
+* customer reviews
+* hotel partnerships
+* airline partnerships
+* guide qualifications
+* years of experience
+* tour prices
+* tour availability
+* offices
+* international branches
+* company registration information
+
+Where real information is unavailable, use clearly marked editable placeholder/demo content.
+
+Make all business information editable through the admin dashboard.
+
+==================================================
+TECHNOLOGY
+==========
+
+Use a modern production-ready stack.
+
+Preferred:
+
+Frontend:
+React
+TypeScript
+Tailwind CSS
+shadcn/ui
+Framer Motion
+
+Backend:
+Node.js
+TypeScript
+Express or an equivalent clean backend architecture
+
+Database:
+PostgreSQL
+
+ORM:
+Drizzle ORM
+
+Validation:
+Zod
+
+Authentication:
+Secure session-based authentication or JWT with secure implementation.
+
+Passwords:
+Argon2 or bcrypt.
+
+Use environment variables for all secrets.
+
+Create:
+
+.env.example
+
+Never expose secrets in frontend code.
+
+==================================================
+DESIGN DIRECTION
+================
+
+The website must look expensive.
+
+Think:
+
+Luxury travel company
++
+African cultural heritage
++
+International editorial magazine
++
+Modern technology.
+
+Avoid generic AI-looking design.
+
+DO NOT overuse:
+
+* purple gradients
+* blue gradients
+* glassmorphism
+* huge glowing cards
+* excessive rounded corners
+* meaningless animations
+* cartoon icons
+* generic stock-template layouts
+
+Use:
+
+* premium typography
+* cinematic photography
+* large editorial imagery
+* elegant whitespace
+* sophisticated layouts
+* subtle shadows
+* refined cards
+* smooth transitions
+* warm luxury colors
+* strong visual hierarchy
+
+Suggested color direction:
+
+Deep charcoal
+Warm ivory
+Sand
+Muted gold
+Earth tones
+
+Use accent colors sparingly.
+
+==================================================
+GLOBAL NAVIGATION
+=================
+
+Create:
+
+Logo / Brand
+
+Explore
+Tours
+Destinations
+Experiences
+Travel Stories
+About
+
+Right side:
+
+Search
+Book a Tour
+
+Mobile navigation must be excellent.
+
+==================================================
+HOMEPAGE
+========
+
+Create an extremely impressive homepage.
+
+Hero:
+
+Large cinematic travel image/video.
+
+Headline:
+
+"Discover the World. Experience Its Story."
+
+Supporting text:
+
+"Curated journeys, cultural experiences and unforgettable adventures — from the historic city of Kano to remarkable destinations around the world."
+
+Buttons:
+
+EXPLORE TOURS
+PLAN YOUR JOURNEY
+
+Add a floating travel search interface.
+
+Fields:
+
+Destination
+Travel Date
+Travelers
+Experience Type
+
+Button:
+
+FIND EXPERIENCES
+
+==================================================
+HOMEPAGE SECTION 2
+==================
+
+Featured Destinations.
+
+Show large visual destination cards.
+
+Initial demo destinations:
+
+Kano
+Nigeria
+Morocco
+Egypt
+Turkey
+United Arab Emirates
+United Kingdom
+France
+Italy
+
+IMPORTANT:
+
+These are demonstration destinations.
+
+The admin must be able to create, edit, delete, reorder, hide, and feature destinations.
+
+==================================================
+HOMEPAGE SECTION 3
+==================
+
+Featured Experiences.
+
+Categories:
+
+Historical & Heritage
+Cultural Experiences
+Nature & Adventure
+Food & Cuisine
+Photography
+Family Experiences
+Private Tours
+Educational Tours
+
+Each category should lead to relevant tours.
+
+==================================================
+HOMEPAGE SECTION 4
+==================
+
+Featured Tours.
+
+Tour cards must contain:
+
+Image
+Tour title
+Destination
+Country
+Duration
+Category
+Starting price
+Rating if genuine
+Availability
+View Tour
+Book Now
+
+All tour data must come from the database.
+
+==================================================
+HOMEPAGE SECTION 5
+==================
+
+FOUNDER STORY.
+
+Headline:
+
+"Travel Beyond the Destination."
+
+Introduce the founder.
+
+Explain that the founder has professional experience at the Kano Museum and has experience sharing the history and heritage of Kano with visitors.
+
+Make this section editable from the admin dashboard.
+
+Do not invent his qualifications.
+
+Button:
+
+MEET OUR FOUNDER
+
+==================================================
+HOMEPAGE SECTION 6
+==================
+
+WHY TRAVEL WITH US?
+
+Create six premium cards:
+
+Local Expertise
+Authentic Experiences
+Professional Service
+Carefully Planned Journeys
+Flexible Tours
+Personalized Support
+
+==================================================
+HOMEPAGE SECTION 7
+==================
+
+HOW IT WORKS
+
+1. Discover
+   Choose your destination or experience.
+
+2. Plan
+   Choose dates, travelers, and options.
+
+3. Book
+   Confirm your details and payment.
+
+4. Experience
+   Enjoy your journey.
+
+==================================================
+HOMEPAGE SECTION 8
+==================
+
+TRAVEL STORIES.
+
+Show latest articles from the blog.
+
+Categories:
+
+History
+Culture
+Destinations
+Travel Tips
+Heritage
+Food
+Travel Stories
+
+==================================================
+HOMEPAGE SECTION 9
+==================
+
+TESTIMONIALS.
+
+Create a testimonial system.
+
+Do not invent real testimonials.
+
+Use demo testimonials clearly marked as demo content or leave the section empty until real reviews are added.
+
+==================================================
+HOMEPAGE SECTION 10
+===================
+
+NEWSLETTER.
+
+Headline:
+
+"Stay Inspired."
+
+Allow visitors to subscribe.
+
+Store subscribers securely.
+
+==================================================
+HOMEPAGE FINAL CTA
+==================
+
+Create a cinematic final section:
+
+"Your Next Story Starts Here."
+
+Buttons:
+
+EXPLORE TOURS
+CONTACT US
+
+==================================================
+TOURS PAGE
+==========
+
+Create:
+
+/tours
+
+Include:
+
+Search
+Filters
+Sorting
+Pagination
+
+Filters:
+
+Destination
+Country
+Region
+Tour category
+Duration
+Price
+Private / Group
+Availability
+
+Sorting:
+
+Recommended
+Newest
+Price Low to High
+Price High to Low
+Popular
+
+Use URL parameters.
+
+Example:
+
+/tours?destination=kano&category=heritage
+
+==================================================
+TOUR DETAIL
+===========
+
+Create dynamic pages:
+
+/tours/:slug
+
+Include:
+
+Large image gallery
+Tour title
+Destination
+Country
+Duration
+Category
+Price
+Availability
+Description
+
+Booking panel.
+
+Customer selects:
+
+Date
+Travelers
+Tour type
+Optional add-ons
+
+Calculate total price dynamically.
+
+Sections:
+
+Overview
+Highlights
+Itinerary
+Included
+Not Included
+Meeting Point
+Important Information
+Requirements
+Cancellation Policy
+Gallery
+Map
+Reviews
+FAQs
+
+Buttons:
+
+BOOK THIS TOUR
+ASK ABOUT THIS TOUR
+
+==================================================
+ITINERARY SYSTEM
+================
+
+Admin can create unlimited itinerary days.
+
+Each day:
+
+Day number
+Title
+Description
+Location
+Start time
+End time
+Activities
+Images
+
+Example:
+
+Day 1
+Arrival & Welcome
+
+Day 2
+Historical City Tour
+
+Day 3
+Cultural Experience
+
+==================================================
+DESTINATIONS
+============
+
+Create:
+
+/destinations
+
+and:
+
+/destinations/:slug
+
+Destination database fields:
+
+Name
+Country
+Region
+Description
+Hero image
+Gallery
+Best time to visit
+Languages
+Currency
+Travel information
+Safety information
+Attractions
+Experiences
+Tours
+Map coordinates
+SEO title
+SEO description
+Slug
+
+==================================================
+BOOKING SYSTEM
+==============
+
+Build a real booking system.
+
+Flow:
+
+SELECT TOUR
+↓
+SELECT DATE
+↓
+SELECT TRAVELERS
+↓
+SELECT OPTIONS
+↓
+CUSTOMER DETAILS
+↓
+REVIEW
+↓
+PAYMENT
+↓
+CONFIRMATION
+
+Customer information:
+
+Full name
+Email
+Phone
+Country
+Number of travelers
+Special requests
+Emergency contact where appropriate
+
+Generate unique booking reference.
+
+Format:
+
+TOUR-2026-000001
+
+Booking statuses:
+
+Pending
+Awaiting Payment
+Paid
+Confirmed
+In Progress
+Completed
+Cancelled
+Refunded
+
+==================================================
+PAYMENTS
+========
+
+Prepare a secure Paystack integration.
+
+Architecture must support:
+
+Card
+Bank Transfer
+Other Paystack-supported payment methods
+
+Create:
+
+POST /api/payments/initialize
+
+POST /api/payments/webhook
+
+GET /api/payments/verify
+
+IMPORTANT:
+
+Never trust payment success from the browser.
+
+Verify payment server-side.
+
+Verify webhook signatures.
+
+Never expose Paystack secret keys.
+
+Use:
+
+PAYSTACK_SECRET_KEY
+
+PAYSTACK_PUBLIC_KEY
+
+through environment variables.
+
+If credentials are not available during development, create a safe development/mock payment mode that is clearly labeled and cannot be mistaken for a real successful payment.
+
+==================================================
+CUSTOMER ACCOUNT
+================
+
+Create:
+
+/login
+/register
+/forgot-password
+/reset-password
+/dashboard
+
+Customer dashboard:
+
+Profile
+Bookings
+Booking details
+Payment status
+Download confirmation
+Cancel eligible booking
+Contact support
+
+==================================================
+ADMIN DASHBOARD
+===============
+
+Create a serious professional admin dashboard.
+
+Dashboard cards:
+
+Total bookings
+Revenue
+Customers
+Tours
+Destinations
+Upcoming tours
+Pending bookings
+Unread inquiries
+
+Charts:
+
+Revenue
+Bookings
+Popular tours
+Popular destinations
+
+Admin navigation:
+
+Dashboard
+Bookings
+Tours
+Destinations
+Customers
+Guides
+Blog
+Gallery
+Testimonials
+FAQs
+Payments
+Inquiries
+Newsletter
+Users
+Settings
+Audit Logs
+
+==================================================
+ADMIN TOUR MANAGEMENT
+=====================
+
+Admin can:
+
+Create tour
+Edit tour
+Delete tour
+Publish/unpublish
+Feature tour
+Set price
+Set duration
+Set category
+Set destination
+Upload images
+Create itinerary
+Set availability
+Add inclusions
+Add exclusions
+Set cancellation policy
+Add FAQs
+
+==================================================
+GUIDE MANAGEMENT
+================
+
+Create guide profiles.
+
+Fields:
+
+Name
+Photo
+Biography
+Languages
+Specialties
+Countries
+Availability
+Status
+Qualifications if provided by business
+
+Do not fabricate qualifications.
+
+==================================================
+BLOG CMS
+========
+
+Create a complete blog CMS.
+
+Admin can:
+
+Create
+Edit
+Draft
+Publish
+Unpublish
+Delete
+
+Article fields:
+
+Title
+Slug
+Excerpt
+Content
+Featured image
+Author
+Category
+Tags
+Published date
+SEO title
+SEO description
+
+==================================================
+GALLERY
+=======
+
+Create premium gallery.
+
+Categories:
+
+Tours
+Destinations
+Culture
+Heritage
+Events
+Experiences
+
+Admin can upload and manage images.
+
+Optimize images.
+
+Lazy load images.
+
+==================================================
+CONTACT
+=======
+
+Create:
+
+/contact
+
+Fields:
+
+Name
+Email
+Phone
+Subject
+Message
+
+Store in database.
+
+Send notification email.
+
+Create admin inquiry management.
+
+Statuses:
+
+New
+In Progress
+Resolved
+Archived
+
+==================================================
+WHATSAPP
+========
+
+Add optional floating WhatsApp button.
+
+Phone number must be configurable from admin settings.
+
+If no WhatsApp number is configured, hide the button.
+
+Do not hardcode a fake number.
+
+==================================================
+MULTI-CURRENCY
+==============
+
+Prepare architecture for:
+
+NGN
+USD
+GBP
+EUR
+AED
+
+Do not hardcode fake exchange rates.
+
+Create currency configuration.
+
+==================================================
+MULTI-LANGUAGE
+==============
+
+Prepare the architecture for:
+
+English
+French
+Arabic
+
+English is the default language.
+
+Do not generate fake translations.
+
+==================================================
+SEO
+===
+
+Implement professional SEO.
+
+Every page needs:
+
+Title
+Meta description
+Canonical URL
+Open Graph
+Twitter/X metadata
+
+Create:
+
+sitemap.xml
+robots.txt
+
+Use structured data where appropriate:
+
+Organization
+Tour
+TouristAttraction
+BreadcrumbList
+Article
+FAQPage
+
+Do not create fake review/rating structured data.
+
+Dynamic SEO for:
+
+Tours
+Destinations
+Blog posts
+
+==================================================
+PERFORMANCE
+===========
+
+Optimize for excellent Lighthouse scores.
+
+Use:
+
+Lazy loading
+Responsive images
+Image compression
+Code splitting
+Caching
+Pagination
+Efficient queries
+Optimized bundles
+
+==================================================
+ACCESSIBILITY
+=============
+
+Follow accessibility best practices.
+
+Include:
+
+Semantic HTML
+Keyboard navigation
+Focus states
+Alt text
+Accessible forms
+Accessible labels
+Good contrast
+Screen-reader support
+
+Support:
+
+prefers-reduced-motion
+
+==================================================
+SECURITY
+========
+
+Implement:
+
+Password hashing
+Authentication
+Authorization
+Role-based access control
+Rate limiting
+Input validation
+Server-side validation
+Secure cookies
+Security headers
+XSS protection
+SQL injection protection
+Safe file uploads
+File size limits
+Brute-force protection
+Audit logs
+
+Never expose:
+
+Passwords
+Database credentials
+Payment secrets
+SMTP passwords
+API keys
+
+==================================================
+DATABASE
+========
+
+Use PostgreSQL + Drizzle.
+
+Create models/tables for:
+
+users
+roles
+permissions
+user_roles
+customers
+guides
+destinations
+destination_images
+tours
+tour_images
+tour_categories
+tour_itineraries
+tour_availability
+tour_addons
+bookings
+booking_items
+payments
+refunds
+reviews
+testimonials
+blog_posts
+blog_categories
+blog_tags
+gallery_images
+faqs
+contact_inquiries
+newsletter_subscribers
+site_settings
+audit_logs
+
+Use:
+
+Foreign keys
+Indexes
+Unique constraints
+Timestamps
+Proper relationships
+
+Create migrations.
+
+==================================================
+API
+===
+
+Create clean REST APIs.
+
+Examples:
+
+GET /api/tours
+GET /api/tours/:slug
+
+GET /api/destinations
+GET /api/destinations/:slug
+
+POST /api/bookings
+GET /api/bookings/:id
+
+POST /api/payments/initialize
+GET /api/payments/verify
+POST /api/payments/webhook
+
+POST /api/contact
+
+GET /api/blog
+GET /api/blog/:slug
+
+Protect admin APIs.
+
+Use Zod validation.
+
+==================================================
+EMAIL
+=====
+
+Create transactional email architecture.
+
+Emails:
+
+Registration
+Password reset
+Booking received
+Payment successful
+Booking confirmed
+Booking cancelled
+Refund
+Contact enquiry
+Admin booking notification
+
+Use environment variables for SMTP/email provider configuration.
+
+==================================================
+BOOKING CONFIRMATION
+====================
+
+After successful booking:
+
+Show:
+
+BOOKING CONFIRMED
+
+Booking reference
+Tour
+Date
+Travelers
+Amount
+Payment status
+
+Buttons:
+
+Download Confirmation
+Print
+Contact Support
+
+==================================================
+LEGAL
+=====
+
+Create:
+
+Privacy Policy
+Terms & Conditions
+Refund/Cancellation Policy
+Cookie Policy
+
+These should be editable/reviewable before launch.
+
+Do not claim legal review.
+
+==================================================
+ANALYTICS
+=========
+
+Prepare integrations for:
+
+Google Analytics
+Google Search Console
+Meta Pixel
+
+Do not use fake tracking IDs.
+
+Keep IDs configurable through environment variables or admin settings where safe.
+
+==================================================
+SOCIAL MEDIA
+============
+
+Create configurable social links:
+
+Instagram
+Facebook
+TikTok
+YouTube
+X
+WhatsApp
+
+Do not invent accounts.
+
+==================================================
+FOOTER
+======
+
+Premium footer containing:
+
+Logo
+Description
+Tours
+Destinations
+Experiences
+About
+Travel Stories
+Contact
+FAQ
+Privacy
+Terms
+Social media
+Newsletter
+
+Use current year dynamically.
+
+==================================================
+DEMO CONTENT
+============
+
+Create safe development content.
+
+Examples:
+
+Kano Heritage Discovery
+Ancient Northern Nigeria Experience
+African Cultural Discovery
+Historic Cairo Experience
+Moroccan Heritage Journey
+Turkish Historical Experience
+
+IMPORTANT:
+
+These are DEMO tours.
+
+Clearly identify them as demo content internally.
+
+Do not claim that these tours are currently available for sale.
+
+Admin must be able to replace them with real tours.
+
+==================================================
+DESIGN DETAILS
+==============
+
+Use premium typography.
+
+Use large immersive images.
+
+Use elegant transitions.
+
+Use subtle hover effects.
+
+Use cinematic sections.
+
+Use editorial-style layouts.
+
+Make the website visually impressive without sacrificing usability.
+
+Do not put animations everywhere.
+
+Do not make the website look like a gaming site.
+
+Do not make it look like an AI dashboard.
+
+This is a luxury/professional travel brand.
+
+==================================================
+MOBILE
+======
+
+Mobile experience is extremely important.
+
+Test:
+
+360px
+390px
+414px
+768px
+1024px
+1440px
+1920px
+
+Ensure:
+
+Navigation works
+Booking works
+Forms work
+Images scale correctly
+Cards do not overflow
+Tables become mobile-friendly
+Admin dashboard remains usable
+
+==================================================
+ERROR STATES
+============
+
+Create professional:
+
+404
+500
+Network error
+Payment failure
+Validation error
+Unauthorized
+Forbidden
+
+==================================================
+LOADING STATES
+==============
+
+Every async operation must have a loading state.
+
+Use skeletons where appropriate.
+
+Buttons must show loading state during submissions.
+
+Prevent duplicate form submissions.
+
+==================================================
+EMPTY STATES
+============
+
+Create useful empty states for:
+
+No tours
+No bookings
+No destinations
+No inquiries
+No blog posts
+No gallery items
+
+==================================================
+PROJECT QUALITY
+===============
+
+Write clean, maintainable TypeScript.
+
+Use reusable components.
+
+Avoid giant components.
+
+Separate:
+
+UI
+API
+Database
+Business logic
+Validation
+Authentication
+Authorization
+
+Use clear naming.
+
+==================================================
+PROJECT STRUCTURE
+=================
+
+Use a professional structure such as:
+
+/client
+/src
+/components
+/pages
+/layouts
+/hooks
+/lib
+/services
+/types
+/assets
+
+/server
+/routes
+/controllers
+/services
+/middleware
+/db
+/validators
+/utils
+
+/shared
+
+/drizzle
+
+/public
+
+Adapt the structure if the chosen framework requires a better architecture.
+
+==================================================
+README
+======
+
+Create a complete README explaining:
+
+Project
+Architecture
+Technology
+Installation
+Environment variables
+Database
+Migrations
+Seed
+Development
+Production
+Deployment
+Paystack setup
+Email setup
+Image storage
+Admin setup
+Security
+
+Create:
+
+.env.example
+
+==================================================
+ADMIN INITIALIZATION
+====================
+
+Create a safe admin initialization mechanism.
+
+Do not hardcode an admin password into the repository.
+
+Use environment variables or a secure first-run setup.
+
+Example:
+
+ADMIN_EMAIL
+ADMIN_INITIAL_PASSWORD
+
+Ensure the password is changed after first login.
+
+==================================================
+TESTING
+=======
+
+Create tests for:
+
+Authentication
+Authorization
+Tour API
+Destination API
+Booking
+Booking validation
+Payment verification
+Admin access
+
+Also test manually:
+
+Homepage
+Tours
+Tour detail
+Booking
+Login
+Registration
+Admin dashboard
+Contact form
+Mobile navigation
+
+==================================================
+FINAL QUALITY CONTROL
+=====================
+
+Before saying the application is finished:
+
+RUN THE APPLICATION.
+
+Check:
+
+Frontend compilation
+Backend startup
+Database connection
+API routes
+Browser console
+Server logs
+Authentication
+Authorization
+Booking
+Payment architecture
+Forms
+Admin
+Mobile responsiveness
+SEO
+Broken links
+Images
+Loading states
+Error states
+
+Fix all actual errors you encounter.
+
+Do not tell me "everything is complete" if important features are only mocked.
+
+==================================================
+REAL-WORLD CONFIGURATION
+========================
+
+At the end, provide a clear checklist of information that I still need to enter:
+
+Company name
+Founder name
+Founder biography
+Founder photo
+Company logo
+Phone
+WhatsApp
+Email
+Office/address
+Social accounts
+Real tour information
+Real destinations
+Real prices
+Payment credentials
+Email credentials
+Map API key
+Analytics IDs
+
+==================================================
+MOST IMPORTANT REQUIREMENT
+==========================
+
+BUILD THE PLATFORM.
+
+Do not just explain how I could build it.
+
+Do not stop at a beautiful homepage.
+
+The website must have a real architecture capable of becoming a functioning international tour business.
+
+Build the foundation so that the business can start with Kano and Nigeria and eventually expand across Africa and the rest of the world.
+
+The final result should make a visitor think:
+
+"This is a serious professional international travel company."
+
+Start by inspecting the existing Replit project and its current technology.
+
+If an existing project is present, preserve useful working functionality and improve it instead of unnecessarily destroying it.
+
+Work systematically through the implementation.
+
+After implementation, run the application, identify errors, and fix them before reporting completion.

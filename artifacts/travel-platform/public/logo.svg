@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" role="img" aria-labelledby="title">
+  <title id="title">From Kano to the World</title>
+  <circle cx="26" cy="26" r="20" fill="none" stroke="#a9854d" stroke-width="1.5"/>
+  <circle cx="26" cy="26" r="12" fill="none" stroke="#a9854d" stroke-width="1"/>
+  <path d="M26 15l3.2 8.2L37 26l-7.8 2.8L26 37l-3.2-8.2L15 26l7.8-2.8L26 15z" fill="none" stroke="#a9854d" stroke-width="1.3"/>
+  <text x="56" y="24" fill="#28231e" font-family="Georgia,serif" font-size="18">From Kano</text>
+  <text x="57" y="39" fill="#5f5549" font-family="Arial,sans-serif" font-size="8" letter-spacing="2.2">TO THE WORLD</text>
+</svg>

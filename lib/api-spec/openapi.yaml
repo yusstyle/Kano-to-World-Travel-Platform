@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Public discovery, inquiry, and authenticated account API for the From Kano to the World travel platform.
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: discovery
+    description: Public destinations, tours, and homepage content
+  - name: communication
+    description: Contact inquiries and newsletter subscriptions
+  - name: authentication
+    description: Authenticated account profile and one-time administrator initialization
 paths:
   /healthz:
     get:
@@ -24,6 +30,221 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /home:
+    get:
+      operationId: getHome
+      tags: [discovery]
+      summary: Get homepage content
+      responses:
+        "200":
+          description: Homepage content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomeContent"
+  /tours:
+    get:
+      operationId: getTours
+      tags: [discovery]
+      summary: Search published tours
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: destination
+          in: query
+          schema: { type: string }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: tourType
+          in: query
+          schema: { type: string, enum: [private, group] }
+        - name: minDuration
+          in: query
+          schema: { type: integer, minimum: 1 }
+        - name: maxDuration
+          in: query
+          schema: { type: integer, minimum: 1 }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [recommended, newest, price_low, price_high] }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 24, default: 9 }
+      responses:
+        "200":
+          description: Matching tours and pagination information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourList"
+  /tours/{slug}:
+    get:
+      operationId: getTour
+      tags: [discovery]
+      summary: Get a published tour
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Tour detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tour"
+        "404":
+          description: Tour not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /destinations:
+    get:
+      operationId: getDestinations
+      tags: [discovery]
+      summary: List featured and published destinations
+      responses:
+        "200":
+          description: Destinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Destination"
+  /destinations/{slug}:
+    get:
+      operationId: getDestination
+      tags: [discovery]
+      summary: Get a published destination
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Destination detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationDetail"
+        "404":
+          description: Destination not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [communication]
+      summary: Submit a contact inquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Inquiry received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
+        "400":
+          description: Invalid inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /newsletter:
+    post:
+      operationId: subscribeNewsletter
+      tags: [communication]
+      summary: Subscribe to travel updates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsletterInput"
+      responses:
+        "201":
+          description: Subscription received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
+        "400":
+          description: Invalid subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/me:
+    get:
+      operationId: getAuthProfile
+      tags: [authentication]
+      summary: Get the signed-in user's local account profile
+      responses:
+        "200":
+          description: Signed-in user's account profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthProfile"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/initialize-admin:
+    post:
+      operationId: initializeAdmin
+      tags: [authentication]
+      summary: Claim the one-time administrator role for the configured verified email
+      description: Requires a signed-in account whose verified primary email matches ADMIN_EMAIL. This succeeds only if no administrator exists.
+      responses:
+        "201":
+          description: Administrator role initialized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthProfile"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Signed-in account does not match the configured verified administrator email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Administrator role has already been initialized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Administrator initialization is not configured or identity could not be verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +254,192 @@ components:
           type: string
       required:
         - status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    Tour:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title: { type: string }
+        destination: { type: string }
+        country: { type: string }
+        region: { type: ["string", "null"] }
+        durationDays: { type: integer }
+        category: { type: string }
+        tourType: { type: string, enum: [private, group, flexible] }
+        priceAmount: { type: ["number", "null"] }
+        priceCurrency: { type: ["string", "null"] }
+        availabilityStatus: { type: string, enum: [inquiry_only, scheduled, unavailable] }
+        imageUrl: { type: string }
+        summary: { type: string }
+        description: { type: string }
+        highlights:
+          type: array
+          items: { type: string }
+        itinerary:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItineraryDay"
+        included:
+          type: array
+          items: { type: string }
+        notIncluded:
+          type: array
+          items: { type: string }
+        isFeatured: { type: boolean }
+        isDemo: { type: boolean }
+      required:
+        - id
+        - slug
+        - title
+        - destination
+        - country
+        - region
+        - durationDays
+        - category
+        - tourType
+        - priceAmount
+        - priceCurrency
+        - availabilityStatus
+        - imageUrl
+        - summary
+        - description
+        - highlights
+        - itinerary
+        - included
+        - notIncluded
+        - isFeatured
+        - isDemo
+    TourCard:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title: { type: string }
+        destination: { type: string }
+        country: { type: string }
+        durationDays: { type: integer }
+        category: { type: string }
+        tourType: { type: string, enum: [private, group, flexible] }
+        priceAmount: { type: ["number", "null"] }
+        priceCurrency: { type: ["string", "null"] }
+        availabilityStatus: { type: string, enum: [inquiry_only, scheduled, unavailable] }
+        imageUrl: { type: string }
+        summary: { type: string }
+        isFeatured: { type: boolean }
+        isDemo: { type: boolean }
+      required:
+        - id
+        - slug
+        - title
+        - destination
+        - country
+        - durationDays
+        - category
+        - tourType
+        - priceAmount
+        - priceCurrency
+        - availabilityStatus
+        - imageUrl
+        - summary
+        - isFeatured
+        - isDemo
+    ItineraryDay:
+      type: object
+      properties:
+        day: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        location: { type: string }
+      required: [day, title, description, location]
+    TourList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TourCard"
+        page: { type: integer }
+        pageSize: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+      required: [items, page, pageSize, total, totalPages]
+    Destination:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        name: { type: string }
+        country: { type: string }
+        region: { type: ["string", "null"] }
+        description: { type: string }
+        imageUrl: { type: string }
+        isFeatured: { type: boolean }
+        isDemo: { type: boolean }
+      required: [id, slug, name, country, region, description, imageUrl, isFeatured, isDemo]
+    DestinationDetail:
+      allOf:
+        - $ref: "#/components/schemas/Destination"
+        - type: object
+          properties:
+            gallery:
+              type: array
+              items: { type: string }
+            bestTimeToVisit: { type: ["string", "null"] }
+            languages:
+              type: array
+              items: { type: string }
+            currencyCode: { type: ["string", "null"] }
+            travelNotes: { type: ["string", "null"] }
+            tourCount: { type: integer }
+          required: [gallery, bestTimeToVisit, languages, currencyCode, travelNotes, tourCount]
+    HomeContent:
+      type: object
+      properties:
+        featuredTours:
+          type: array
+          items:
+            $ref: "#/components/schemas/TourCard"
+        featuredDestinations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Destination"
+        experienceCategories:
+          type: array
+          items: { type: string }
+      required: [featuredTours, featuredDestinations, experienceCategories]
+    ContactInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 2, maxLength: 120 }
+        email: { type: string, format: email, maxLength: 320 }
+        phone: { type: ["string", "null"], maxLength: 40 }
+        subject: { type: string, minLength: 2, maxLength: 160 }
+        message: { type: string, minLength: 10, maxLength: 5000 }
+      required: [name, email, subject, message]
+    NewsletterInput:
+      type: object
+      properties:
+        email: { type: string, format: email, maxLength: 320 }
+      required: [email]
+    SubmissionReceipt:
+      type: object
+      properties:
+        id: { type: integer }
+        message: { type: string }
+      required: [id, message]
+    AuthProfile:
+      type: object
+      properties:
+        clerkUserId: { type: string }
+        role: { type: string, enum: [customer, admin] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        canInitializeAdmin: { type: boolean }
+      required: [clerkUserId, role, createdAt, updatedAt, canInitializeAdmin]
 
