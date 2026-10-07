@@ -1,14 +1,20 @@
 import { defineConfig } from "drizzle-kit";
 import path from "path";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL, ensure the database is provisioned");
-}
+const isLocalDatabase = !process.env.DATABASE_URL;
+const schemaPath = path
+  .resolve(__dirname, "./src/schema/**/*.ts")
+  .replaceAll("\\", "/");
 
 export default defineConfig({
-  schema: path.join(__dirname, "./src/schema/index.ts"),
+  schema: schemaPath,
   dialect: "postgresql",
-  dbCredentials: {
-    url: process.env.DATABASE_URL,
-  },
+  ...(isLocalDatabase
+    ? {
+        driver: "pglite",
+        dbCredentials: { url: process.env.PGLITE_DATA_DIR ?? "./data/pglite" },
+      }
+    : {
+        dbCredentials: { url: process.env.DATABASE_URL! },
+      }),
 });

@@ -1,8 +1,7 @@
 import { clerkClient, getAuth } from "@clerk/express";
-import { eq, sql } from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import { GetAuthProfileResponse, InitializeAdminResponse } from "@workspace/api-zod";
-import { db, userProfilesTable } from "@workspace/db";
+import { db, eq, sql, userProfilesTable } from "@workspace/db";
 
 const router: IRouter = Router();
 

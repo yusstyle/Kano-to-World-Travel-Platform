@@ -1,7 +1,6 @@
 import { getAuth } from "@clerk/express";
 import type { NextFunction, Request, Response } from "express";
-import { eq } from "drizzle-orm";
-import { db, userProfilesTable } from "@workspace/db";
+import { db, eq, userProfilesTable } from "@workspace/db";
 
 export async function requireAdmin(
   req: Request,

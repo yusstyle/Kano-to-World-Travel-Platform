@@ -20,20 +20,17 @@ import type { Destination, DestinationDetail, Tour, TourCard } from '@workspace/
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
+const configuredClerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const clerkEnabled = Boolean(configuredClerkKey);
+const clerkPubKey = clerkEnabled
+  ? publishableKeyFromHost(window.location.hostname, configuredClerkKey)
+  : '';
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath)
     ? path.slice(basePath.length) || '/'
     : path;
-}
-
-if (!clerkPubKey) {
-  throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY');
 }
 
 const clerkAppearance = {
@@ -102,8 +99,10 @@ function Header() {
       <button className="menu-toggle btn-outline" onClick={() => setOpen(!open)} aria-label={open ? 'Close navigation' : 'Open navigation'} data-testid="button-menu" style={{ padding: 10, border: 0 }}>{open ? <X size={21}/> : <Menu size={21}/>}</button>
       <nav className={`nav-items ${open ? 'open' : ''}`} aria-label="Main navigation" style={{ alignItems: 'center', gap: 'clamp(18px,3vw,42px)' }}>
         {nav.map(item => <Link key={item.href} href={item.href} className="nav-link" data-testid={`link-nav-${item.text.toLowerCase().replaceAll(' ','-')}`} onClick={() => setOpen(false)} style={{ fontSize: 12, color: location === item.href ? '#987441' : '#4a433a' }}>{item.text}</Link>)}
-        <Show when="signed-out"><Link href="/sign-in" className="nav-link" data-testid="link-sign-in" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Sign in</Link><Link href="/sign-up" className="nav-link" data-testid="link-sign-up" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Create account</Link></Show>
-        <Show when="signed-in"><Link href="/account" className="nav-link" data-testid="link-account" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>My account</Link></Show>
+        {clerkEnabled && <>
+          <Show when="signed-out"><Link href="/sign-in" className="nav-link" data-testid="link-sign-in" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Sign in</Link><Link href="/sign-up" className="nav-link" data-testid="link-sign-up" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Create account</Link></Show>
+          <Show when="signed-in"><Link href="/account" className="nav-link" data-testid="link-account" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>My account</Link></Show>
+        </>}
         <Link href="/contact" className="btn-dark" data-testid="link-contact-nav" onClick={() => setOpen(false)} style={{ padding: '12px 17px' }}>Make an enquiry <ArrowRight size={14}/></Link>
       </nav>
     </div>
@@ -394,18 +393,30 @@ function Router() {
 }
 
 function HomeRedirect() {
+  if (!clerkEnabled) {
+    return <HomePage />;
+  }
   return <><Show when="signed-in"><Redirect to="/account"/></Show><Show when="signed-out"><HomePage/></Show></>;
 }
 
 function AccountRoute() {
+  if (!clerkEnabled) {
+    return <Redirect to="/" />;
+  }
   return <><Show when="signed-in"><AccountPage/></Show><Show when="signed-out"><Redirect to="/sign-in"/></Show></>;
 }
 
 function SignInPage() {
+  if (!clerkEnabled) {
+    return <Redirect to="/" />;
+  }
   return <main className="auth-route"><Link href="/" className="auth-back-link" data-testid="link-auth-home">From Kano to the World</Link><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`}/></main>;
 }
 
 function SignUpPage() {
+  if (!clerkEnabled) {
+    return <Redirect to="/" />;
+  }
   return <main className="auth-route"><Link href="/" className="auth-back-link" data-testid="link-auth-home">From Kano to the World</Link><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`}/></main>;
 }
 
@@ -458,6 +469,14 @@ function ClerkQueryClientCacheInvalidator() {
 
 function ClerkApp() {
   const [, setLocation] = useLocation();
+  const content = (
+    <QueryClientProvider client={queryClient}><TooltipProvider><Router/><Toaster/></TooltipProvider></QueryClientProvider>
+  );
+
+  if (!clerkEnabled) {
+    return content;
+  }
+
   return <ClerkProvider
     publishableKey={clerkPubKey}
     proxyUrl={clerkProxyUrl}
@@ -471,7 +490,8 @@ function ClerkApp() {
     routerPush={(to) => setLocation(stripBase(to))}
     routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
   >
-    <QueryClientProvider client={queryClient}><TooltipProvider><ClerkQueryClientCacheInvalidator/><Router/><Toaster/></TooltipProvider></QueryClientProvider>
+    <ClerkQueryClientCacheInvalidator />
+    {content}
   </ClerkProvider>;
 }
 

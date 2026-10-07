@@ -1,15 +1,3 @@
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gte,
-  ilike,
-  isNotNull,
-  lte,
-  or,
-} from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import {
   GetDestinationParams,
@@ -22,8 +10,18 @@ import {
   GetToursResponse,
 } from "@workspace/api-zod";
 import {
+  and,
+  asc,
+  count,
   db,
+  desc,
   destinationsTable,
+  eq,
+  gte,
+  ilike,
+  isNotNull,
+  lte,
+  or,
   toursTable,
 } from "@workspace/db";
 

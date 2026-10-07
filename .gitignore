@@ -8,6 +8,12 @@ out-tsc
 .expo
 .expo-shared
 
+# local development data and secrets
+data/
+.env
+.env.*
+!.env.example
+
 # dependencies
 node_modules
 
