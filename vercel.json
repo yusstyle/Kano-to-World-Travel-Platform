@@ -1,0 +1,4 @@
+{
+  "buildCommand": "pnpm --filter @workspace/travel-platform build",
+  "outputDirectory": "artifacts/travel-platform/dist/public"
+}
