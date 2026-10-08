@@ -245,6 +245,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /admin/site-content:
+    get:
+      operationId: getAdminSiteContent
+      tags: [authentication]
+      summary: Load editable site content for an administrator
+      responses:
+        "200":
+          description: Site content editor data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteContent"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      operationId: updateAdminSiteContent
+      tags: [authentication]
+      summary: Update founder content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteContent"
+      responses:
+        "200":
+          description: Updated site content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteContent"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     HealthStatus:
@@ -412,7 +465,17 @@ components:
         experienceCategories:
           type: array
           items: { type: string }
-      required: [featuredTours, featuredDestinations, experienceCategories]
+        founderName: { type: string }
+        founderBio: { type: string }
+        founderImageUrl: { type: string, maxLength: 2048 }
+      required: [featuredTours, featuredDestinations, experienceCategories, founderName, founderBio, founderImageUrl]
+    SiteContent:
+      type: object
+      properties:
+        founderName: { type: string, minLength: 2, maxLength: 120 }
+        founderBio: { type: string, minLength: 10, maxLength: 5000 }
+        founderImageUrl: { type: string, minLength: 1, maxLength: 2048 }
+      required: [founderName, founderBio, founderImageUrl]
     ContactInput:
       type: object
       properties:

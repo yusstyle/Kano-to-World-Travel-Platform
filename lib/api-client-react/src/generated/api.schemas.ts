@@ -140,6 +140,28 @@ export interface HomeContent {
   featuredTours: TourCard[];
   featuredDestinations: Destination[];
   experienceCategories: string[];
+  founderName: string;
+  founderBio: string;
+  /** @maxLength 2048 */
+  founderImageUrl: string;
+}
+
+export interface SiteContent {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  founderName: string;
+  /**
+     * @minLength 10
+     * @maxLength 5000
+     */
+  founderBio: string;
+  /**
+     * @minLength 1
+     * @maxLength 2048
+     */
+  founderImageUrl: string;
 }
 
 export interface ContactInput {

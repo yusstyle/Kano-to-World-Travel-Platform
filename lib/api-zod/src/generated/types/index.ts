@@ -19,6 +19,7 @@ export * from './healthStatus';
 export * from './homeContent';
 export * from './itineraryDay';
 export * from './newsletterInput';
+export * from './siteContent';
 export * from './submissionReceipt';
 export * from './tour';
 export * from './tourAvailabilityStatus';

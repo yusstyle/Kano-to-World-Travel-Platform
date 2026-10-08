@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
-import { ClerkProvider, Show, SignIn, SignUp, useClerk, useUser } from '@clerk/react';
+import { ClerkProvider, Show, SignIn, SignUp, useClerk, useSession, useUser } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -14,7 +14,9 @@ import {
   getGetTourQueryKey, getGetDestinationQueryKey,
   useGetHome, useGetTours, useGetTour, useGetDestinations, useGetDestination,
   useHealthCheck, useSubmitContact, useSubscribeNewsletter,
-  useGetAuthProfile, useInitializeAdmin, getGetAuthProfileQueryKey,
+  useGetAuthProfile, useInitializeAdmin, useGetAdminSiteContent,
+  useUpdateAdminSiteContent, getGetAuthProfileQueryKey,
+  getGetAdminSiteContentQueryKey, getGetHomeQueryKey, setAuthTokenGetter,
 } from '@workspace/api-client-react';
 import type { Destination, DestinationDetail, Tour, TourCard } from '@workspace/api-client-react';
 
@@ -204,8 +206,8 @@ function HomePage() {
     </div></section>
     <section className="section-pad" style={{ background: '#eee8dc' }}><div className="site-wrap"><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', gap: 20, marginBottom: 34 }}><div><p className="eyebrow">A few ways in</p><h2 className="serif" style={{ fontSize: 'clamp(2.4rem,5vw,4rem)', fontWeight: 400, margin: '13px 0 0' }}>Featured journeys</h2></div><Link href="/tours" className="btn-outline" data-testid="link-all-tours">All tours <ArrowRight size={14}/></Link></div>{home.isLoading ? <LoadingCards/> : home.isError ? <ErrorState retry={() => home.refetch()}/> : !home.data?.featuredTours?.length ? <EmptyState title="The next chapter is taking shape" text="There are no featured journeys to show at the moment. Explore again soon."/> : <div className="content-grid">{home.data.featuredTours.map(tour => <TourCardView key={tour.id} tour={tour}/>)}</div>}</div></section>
     <section className="founder-home" style={{ display: 'grid', gridTemplateColumns: '1.1fr .9fr', minHeight: 530, background: '#302921', color: '#f8f4ec' }} data-testid="section-founder-home">
-      <div className="founder-home-photo hero-image" role="img" aria-label="A historic street in Kano" style={{ minHeight: 350, backgroundImage: "linear-gradient(0deg,rgba(35,29,23,.15),rgba(35,29,23,.15)),url('/kano-editorial.jpg')" }}/>
-      <div className="founder-home-copy" style={{ padding: 'clamp(3rem,7vw,7rem) clamp(2rem,7vw,6rem)', alignSelf: 'center' }}><p className="eyebrow" style={{ color: '#c5a673' }}>The founder</p><h2 className="serif" style={{ fontSize: 'clamp(2.5rem,4.5vw,4rem)', fontWeight: 400, lineHeight: 1.1, margin: '18px 0' }}>Meet our founder</h2><p style={{ color: '#d1c6b6', fontSize: 14, lineHeight: 1.85, maxWidth: 470 }}>A Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage.</p><Link href="/about" className="btn-gold" data-testid="link-home-founder-story" style={{ marginTop: 18 }}>Read the story <ArrowRight size={15}/></Link><Link href="/destinations" data-testid="link-discover-destinations" style={{ display: 'block', marginTop: 20, color: '#e1d2b9', fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>Explore destinations <ArrowRight size={13} style={{ verticalAlign: 'middle' }}/></Link></div>
+      <div className="founder-home-photo hero-image" role="img" aria-label={home.data?.founderName ?? 'Founder'} style={{ minHeight: 350, backgroundImage: `linear-gradient(0deg,rgba(35,29,23,.15),rgba(35,29,23,.15)),url("${home.data?.founderImageUrl ?? '/kano-editorial.jpg'}")` }}/>
+      <div className="founder-home-copy" style={{ padding: 'clamp(3rem,7vw,7rem) clamp(2rem,7vw,6rem)', alignSelf: 'center' }}><p className="eyebrow" style={{ color: '#c5a673' }}>The founder</p><h2 className="serif" style={{ fontSize: 'clamp(2.5rem,4.5vw,4rem)', fontWeight: 400, lineHeight: 1.1, margin: '18px 0' }}>Meet {home.data?.founderName ?? 'our founder'}</h2><p style={{ color: '#d1c6b6', fontSize: 14, lineHeight: 1.85, maxWidth: 470 }}>{home.data?.founderBio ?? 'Founder biography will appear here.'}</p><Link href="/about" className="btn-gold" data-testid="link-home-founder-story" style={{ marginTop: 18 }}>Read the story <ArrowRight size={15}/></Link><Link href="/destinations" data-testid="link-discover-destinations" style={{ display: 'block', marginTop: 20, color: '#e1d2b9', fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>Explore destinations <ArrowRight size={13} style={{ verticalAlign: 'middle' }}/></Link></div>
     </section>
     <section className="section-pad" style={{ background: '#f8f5ee' }} data-testid="section-travel-values"><div className="site-wrap"><p className="eyebrow">Thoughtful from the outset</p><h2 className="serif" style={{ fontSize: 'clamp(2.4rem,5vw,4rem)', fontWeight: 400, margin: '13px 0 34px' }}>Why travel with us?</h2><div className="values-grid">{['Local Expertise','Authentic Experiences','Professional Service','Carefully Planned Journeys','Flexible Tours','Personalized Support'].map((value,i) => <div key={value} data-testid={`value-travel-${i}`} style={{ display: 'grid', gridTemplateColumns: '38px 1fr', gap: 13, alignItems: 'center', borderTop: '1px solid #d8cdbd', padding: '20px 0' }}><span className="serif" style={{ fontSize: 16, color: '#a9854d' }}>0{i+1}</span><h3 className="serif" style={{ fontWeight: 400, fontSize: 23, margin: 0 }}>{value}</h3></div>)}</div></div></section>
     <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap"><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', gap: 20, marginBottom: 35 }}><div><p className="eyebrow">Places with a pulse</p><h2 className="serif" style={{ fontSize: 'clamp(2.4rem,5vw,4rem)', fontWeight: 400, margin: '13px 0 0' }}>Where the stories unfold</h2></div><Link href="/destinations" className="btn-outline" data-testid="link-all-destinations">All destinations <ArrowRight size={14}/></Link></div>{home.isLoading ? <LoadingCards/> : home.isError ? <ErrorState retry={() => home.refetch()}/> : !home.data?.featuredDestinations?.length ? <EmptyState title="Places are being added" text="Destination stories will appear here as they are published."/> : <div className="content-grid">{home.data.featuredDestinations.map(place => <DestinationCard key={place.id} destination={place}/>)}</div>}</div></section>
@@ -281,8 +283,12 @@ function DestinationDetailPage() {
 function Fact({label,value}:{label:string;value:string}) { return <div style={{ borderTop: '1px solid #d4c9b9', padding: '14px 0' }}><p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.13em', color: '#987441', margin: '0 0 6px' }}>{label}</p><p style={{ color: '#484139', fontSize: 13, margin: 0, lineHeight: 1.6 }}>{value}</p></div>; }
 
 function AboutPage() {
-  return <Shell><main><PageIntro eyebrow="A point of view, not a package" title="A journey that begins in Kano." text="From Kano to the World is led by a Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage."/>
-    <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ display: 'grid', gridTemplateColumns: 'minmax(260px,.85fr) minmax(0,1.15fr)', gap: 'clamp(35px,8vw,115px)', alignItems: 'center' }}><div className="hero-image" role="img" aria-label="A view of historic Kano" style={{ minHeight: 490, backgroundImage: "url('/kano-editorial.jpg')" }}/><div><p className="eyebrow">The person behind the perspective</p><h2 className="serif" style={{ fontWeight: 400, fontSize: 'clamp(2.5rem,4vw,4rem)', lineHeight: 1.12 }}>Meet our founder</h2><p style={{ fontSize: 15, lineHeight: 1.9, color: '#62594f' }}>A Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage.</p><Link href="/contact" className="btn-dark" data-testid="link-about-contact" style={{ marginTop: 15 }}>Start a conversation <ArrowRight size={14}/></Link></div></div></section>
+  const home = useGetHome();
+  const founderName = home.data?.founderName ?? 'Our founder';
+  const founderBio = home.data?.founderBio ?? 'Founder biography will appear here.';
+  const founderImage = home.data?.founderImageUrl ?? '/kano-editorial.jpg';
+  return <Shell><main><PageIntro eyebrow="A point of view, not a package" title="A journey that begins in Kano." text={founderBio}/>
+    <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ display: 'grid', gridTemplateColumns: 'minmax(260px,.85fr) minmax(0,1.15fr)', gap: 'clamp(35px,8vw,115px)', alignItems: 'center' }}><div className="hero-image" role="img" aria-label={founderName} style={{ minHeight: 490, backgroundImage: `url("${founderImage}")` }}/><div><p className="eyebrow">The person behind the perspective</p><h2 className="serif" style={{ fontWeight: 400, fontSize: 'clamp(2.5rem,4vw,4rem)', lineHeight: 1.12 }}>Meet {founderName}</h2><p style={{ fontSize: 15, lineHeight: 1.9, color: '#62594f' }}>{founderBio}</p><Link href="/contact" className="btn-dark" data-testid="link-about-contact" style={{ marginTop: 15 }}>Start a conversation <ArrowRight size={14}/></Link></div></div></section>
     <section className="dark-panel section-pad"><div className="site-wrap" style={{ maxWidth: 950, textAlign: 'center' }}><p className="eyebrow" style={{ color: '#c3a574' }}>Our approach</p><h2 className="serif" style={{ fontWeight: 400, fontSize: 'clamp(2.6rem,5vw,4.5rem)', lineHeight: 1.13, margin: '18px auto 24px' }}>Specific enough to feel a place. Open enough to let it speak.</h2><p style={{ color: '#cfc4b5', lineHeight: 1.9, maxWidth: 700, margin: 'auto' }}>We make space for historical depth, living culture and the unexpected details a map cannot show. This is a public invitation to discover; practical arrangements begin only through direct inquiry.</p></div></section>
     <section className="section-pad" style={{ background: '#eee8dc', textAlign: 'center' }}><div className="site-wrap"><p className="eyebrow">The next step</p><h2 className="serif" style={{ fontSize: 42, fontWeight: 400, margin: '12px 0 25px' }}>Tell us what you’re curious about.</h2><Link href="/contact" className="btn-dark" data-testid="link-about-inquiry">Get in touch <ArrowRight size={14}/></Link></div></section>
   </main></Shell>;
@@ -388,6 +394,7 @@ function Router() {
     <Route path="/sign-in/*?" component={SignInPage}/>
     <Route path="/sign-up/*?" component={SignUpPage}/>
     <Route path="/account" component={AccountRoute}/>
+    <Route path="/admin" component={AdminRoute}/>
     <Route component={NotFound}/>
   </Switch></ErrorBoundary>;
 }
@@ -397,6 +404,13 @@ function HomeRedirect() {
     return <HomePage />;
   }
   return <><Show when="signed-in"><Redirect to="/account"/></Show><Show when="signed-out"><HomePage/></Show></>;
+}
+
+function AdminRoute() {
+  if (!clerkEnabled) {
+    return <Redirect to="/" />;
+  }
+  return <><Show when="signed-in"><AdminPage/></Show><Show when="signed-out"><Redirect to="/sign-in"/></Show></>;
 }
 
 function AccountRoute() {
@@ -418,6 +432,56 @@ function SignUpPage() {
     return <Redirect to="/" />;
   }
   return <main className="auth-route"><Link href="/" className="auth-back-link" data-testid="link-auth-home">From Kano to the World</Link><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`}/></main>;
+}
+
+function AdminPage() {
+  const profile = useGetAuthProfile({ query: { queryKey: getGetAuthProfileQueryKey(), retry: false } });
+  const content = useGetAdminSiteContent({ query: { queryKey: getGetAdminSiteContentQueryKey(), retry: false } });
+  const updateContent = useUpdateAdminSiteContent();
+  const client = useQueryClient();
+  const [form, setForm] = useState({
+    founderName: '',
+    founderBio: '',
+    founderImageUrl: '',
+  });
+
+  useEffect(() => {
+    if (content.data) {
+      setForm(content.data);
+    }
+  }, [content.data]);
+
+  const save = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    updateContent.mutate({ data: form }, {
+      onSuccess: async () => {
+        await client.invalidateQueries({ queryKey: getGetHomeQueryKey() });
+      },
+    });
+  };
+
+  if (profile.isLoading || content.isLoading) {
+    return <Shell><main className="section-pad"><p role="status">Loading administrator tools…</p></main></Shell>;
+  }
+  if (profile.isError || content.isError || profile.data?.role !== 'admin') {
+    return <Shell><main className="section-pad"><div className="site-wrap"><p className="eyebrow">Admin access</p><h1 className="serif">Administrator access required.</h1><p style={{ color: '#62594e' }}>Sign in with an administrator account to edit this website.</p></div></main></Shell>;
+  }
+
+  return <Shell><main><PageIntro eyebrow="Content control" title="Website editor" text="Update the founder story and image shown across the public website. Changes are saved in the database and appear after the homepage refreshes."/>
+    <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ maxWidth: 960 }}>
+      <div className="account-card">
+        <p className="eyebrow">Founder profile</p>
+        <h2 className="serif" style={{ fontSize: 37, fontWeight: 400, margin: '10px 0 24px' }}>Edit founder content</h2>
+        <form onSubmit={save} style={{ display: 'grid', gap: 18 }}>
+          <label style={{ fontSize: 12 }}>Founder name<input className="field" required minLength={2} maxLength={120} value={form.founderName} onChange={event => setForm(current => ({ ...current, founderName: event.target.value }))} data-testid="input-admin-founder-name" style={{ display: 'block', marginTop: 8 }}/></label>
+          <label style={{ fontSize: 12 }}>Founder biography<textarea className="field" required minLength={10} maxLength={5000} rows={7} value={form.founderBio} onChange={event => setForm(current => ({ ...current, founderBio: event.target.value }))} data-testid="input-admin-founder-bio" style={{ display: 'block', marginTop: 8, resize: 'vertical' }}/></label>
+          <label style={{ fontSize: 12 }}>Founder image URL or path<input className="field" required type="text" maxLength={2048} placeholder="e.g. /kano-editorial.jpg or https://..." value={form.founderImageUrl} onChange={event => setForm(current => ({ ...current, founderImageUrl: event.target.value }))} data-testid="input-admin-founder-image" style={{ display: 'block', marginTop: 8 }}/></label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}><button className="btn-dark" type="submit" disabled={updateContent.isPending} data-testid="button-admin-save-content">{updateContent.isPending ? 'Saving…' : 'Save founder content'} <Check size={14}/></button>{updateContent.isError && <p role="alert" style={{ color: '#983e31', fontSize: 12, margin: 0 }}>The content could not be saved. Check the image URL and try again.</p>}</div>
+          {form.founderImageUrl && <img src={form.founderImageUrl} alt="Founder preview" data-testid="img-admin-founder-preview" style={{ width: 180, height: 220, objectFit: 'cover', border: '1px solid #d8cdbd' }}/>} 
+        </form>
+      </div>
+    </div></section>
+  </main></Shell>;
 }
 
 function AccountPage() {
@@ -446,6 +510,19 @@ function AccountPage() {
       </div>
     </div></section>
   </main></Shell>;
+}
+
+function ClerkAuthTokenProvider() {
+  const { isSignedIn, session } = useSession();
+
+  useEffect(() => {
+    setAuthTokenGetter(async () => {
+      if (!isSignedIn || !session) return null;
+      return session.getToken();
+    });
+  }, [isSignedIn, session]);
+
+  return null;
 }
 
 function ClerkQueryClientCacheInvalidator() {
@@ -491,6 +568,7 @@ function ClerkApp() {
     routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
   >
     <ClerkQueryClientCacheInvalidator />
+    <ClerkAuthTokenProvider />
     {content}
   </ClerkProvider>;
 }

@@ -20,6 +20,10 @@ export const HealthCheckResponse = zod.object({
 /**
  * @summary Get homepage content
  */
+export const getHomeResponseFounderImageUrlMax = 2048;
+
+
+
 export const GetHomeResponse = zod.object({
   "featuredTours": zod.array(zod.object({
   "id": zod.number().int(),
@@ -49,7 +53,10 @@ export const GetHomeResponse = zod.object({
   "isFeatured": zod.boolean(),
   "isDemo": zod.boolean()
 })),
-  "experienceCategories": zod.array(zod.string())
+  "experienceCategories": zod.array(zod.string()),
+  "founderName": zod.string(),
+  "founderBio": zod.string(),
+  "founderImageUrl": zod.string().max(getHomeResponseFounderImageUrlMax)
 })
 
 
@@ -254,6 +261,62 @@ export const InitializeAdminResponse = zod.object({
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
   "canInitializeAdmin": zod.boolean()
+})
+
+
+/**
+ * @summary Load editable site content for an administrator
+ */
+export const getAdminSiteContentResponseFounderNameMin = 2;
+export const getAdminSiteContentResponseFounderNameMax = 120;
+
+export const getAdminSiteContentResponseFounderBioMin = 10;
+export const getAdminSiteContentResponseFounderBioMax = 5000;
+
+export const getAdminSiteContentResponseFounderImageUrlMax = 2048;
+
+
+
+export const GetAdminSiteContentResponse = zod.object({
+  "founderName": zod.string().min(getAdminSiteContentResponseFounderNameMin).max(getAdminSiteContentResponseFounderNameMax),
+  "founderBio": zod.string().min(getAdminSiteContentResponseFounderBioMin).max(getAdminSiteContentResponseFounderBioMax),
+  "founderImageUrl": zod.string().min(1).max(getAdminSiteContentResponseFounderImageUrlMax)
+})
+
+
+/**
+ * @summary Update founder content
+ */
+export const updateAdminSiteContentBodyFounderNameMin = 2;
+export const updateAdminSiteContentBodyFounderNameMax = 120;
+
+export const updateAdminSiteContentBodyFounderBioMin = 10;
+export const updateAdminSiteContentBodyFounderBioMax = 5000;
+
+export const updateAdminSiteContentBodyFounderImageUrlMax = 2048;
+
+
+
+export const UpdateAdminSiteContentBody = zod.object({
+  "founderName": zod.string().min(updateAdminSiteContentBodyFounderNameMin).max(updateAdminSiteContentBodyFounderNameMax),
+  "founderBio": zod.string().min(updateAdminSiteContentBodyFounderBioMin).max(updateAdminSiteContentBodyFounderBioMax),
+  "founderImageUrl": zod.string().min(1).max(updateAdminSiteContentBodyFounderImageUrlMax)
+})
+
+export const updateAdminSiteContentResponseFounderNameMin = 2;
+export const updateAdminSiteContentResponseFounderNameMax = 120;
+
+export const updateAdminSiteContentResponseFounderBioMin = 10;
+export const updateAdminSiteContentResponseFounderBioMax = 5000;
+
+export const updateAdminSiteContentResponseFounderImageUrlMax = 2048;
+
+
+
+export const UpdateAdminSiteContentResponse = zod.object({
+  "founderName": zod.string().min(updateAdminSiteContentResponseFounderNameMin).max(updateAdminSiteContentResponseFounderNameMax),
+  "founderBio": zod.string().min(updateAdminSiteContentResponseFounderBioMin).max(updateAdminSiteContentResponseFounderBioMax),
+  "founderImageUrl": zod.string().min(1).max(updateAdminSiteContentResponseFounderImageUrlMax)
 })
 
 

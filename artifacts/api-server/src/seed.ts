@@ -1,11 +1,19 @@
 import {
   db,
   destinationsTable,
+  siteContentTable,
   toursTable,
   type InsertDestination,
   type InsertTour,
 } from "@workspace/db";
 import { logger } from "./lib/logger";
+
+const defaultSiteContent = {
+  founderName: "A Kano-based professional working in culture and history",
+  founderBio:
+    "A Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage.",
+  founderImageUrl: "/kano-editorial.jpg",
+};
 
 const demoDestinations: InsertDestination[] = [
   {
@@ -249,6 +257,14 @@ export async function seedDemoContent(): Promise<void> {
     .select({ id: toursTable.id })
     .from(toursTable)
     .limit(1);
+  const [existingSiteContent] = await db
+    .select({ id: siteContentTable.id })
+    .from(siteContentTable)
+    .limit(1);
+
+  if (!existingSiteContent) {
+    await db.insert(siteContentTable).values(defaultSiteContent);
+  }
 
   if (existingDestination || existingTour) {
     return;

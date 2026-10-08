@@ -5,15 +5,21 @@
  * Public discovery, inquiry, and authenticated account API for the From Kano to the World travel platform.
  * OpenAPI spec version: 0.1.0
  */
-import type { Destination } from './destination';
-import type { TourCard } from './tourCard';
 
-export interface HomeContent {
-  featuredTours: TourCard[];
-  featuredDestinations: Destination[];
-  experienceCategories: string[];
+export interface SiteContent {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
   founderName: string;
+  /**
+     * @minLength 10
+     * @maxLength 5000
+     */
   founderBio: string;
-  /** @maxLength 2048 */
+  /**
+     * @minLength 1
+     * @maxLength 2048
+     */
   founderImageUrl: string;
 }

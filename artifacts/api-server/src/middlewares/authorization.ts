@@ -2,12 +2,20 @@ import { getAuth } from "@clerk/express";
 import type { NextFunction, Request, Response } from "express";
 import { db, eq, userProfilesTable } from "@workspace/db";
 
+export function getSafeUserId(req: Request): string | null {
+  try {
+    return getAuth(req).userId ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function requireAdmin(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const { userId } = getAuth(req);
+  const userId = getSafeUserId(req);
   if (!userId) {
     res.status(401).json({ error: "Authentication is required." });
     return;

@@ -22,6 +22,7 @@ import {
   isNotNull,
   lte,
   or,
+  siteContentTable,
   toursTable,
 } from "@workspace/db";
 
@@ -56,7 +57,7 @@ function toTourCard({ tour, destination }: JoinedTour) {
 }
 
 router.get("/home", async (_req, res): Promise<void> => {
-  const [featuredTours, featuredDestinations] = await Promise.all([
+  const [featuredTours, featuredDestinations, siteContentRows] = await Promise.all([
     db
       .select({ tour: toursTable, destination: destinationsTable })
       .from(toursTable)
@@ -84,7 +85,21 @@ router.get("/home", async (_req, res): Promise<void> => {
       )
       .orderBy(asc(destinationsTable.sortOrder), asc(destinationsTable.name))
       .limit(6),
+    db
+      .select({
+        founderName: siteContentTable.founderName,
+        founderBio: siteContentTable.founderBio,
+        founderImageUrl: siteContentTable.founderImageUrl,
+      })
+      .from(siteContentTable)
+      .limit(1),
   ]);
+  const siteContent = siteContentRows[0] ?? {
+    founderName: "A Kano-based professional working in culture and history",
+    founderBio:
+      "A Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage.",
+    founderImageUrl: "/kano-editorial.jpg",
+  };
 
   res.json(
     GetHomeResponse.parse({
@@ -100,6 +115,7 @@ router.get("/home", async (_req, res): Promise<void> => {
         "Private Tours",
         "Educational Tours",
       ],
+      ...siteContent,
     }),
   );
 });

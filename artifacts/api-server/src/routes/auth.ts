@@ -1,7 +1,8 @@
-import { clerkClient, getAuth } from "@clerk/express";
+import { clerkClient } from "@clerk/express";
 import { Router, type IRouter } from "express";
 import { GetAuthProfileResponse, InitializeAdminResponse } from "@workspace/api-zod";
 import { db, eq, sql, userProfilesTable } from "@workspace/db";
+import { getSafeUserId } from "../middlewares/authorization";
 
 const router: IRouter = Router();
 
@@ -19,7 +20,7 @@ function toProfileResponse(
 }
 
 router.get("/auth/me", async (req, res): Promise<void> => {
-  const { userId } = getAuth(req);
+  const userId = getSafeUserId(req);
   if (!userId) {
     res.status(401).json({ error: "Authentication is required." });
     return;
@@ -58,7 +59,7 @@ router.get("/auth/me", async (req, res): Promise<void> => {
 });
 
 router.post("/auth/initialize-admin", async (req, res): Promise<void> => {
-  const { userId } = getAuth(req);
+  const userId = getSafeUserId(req);
   if (!userId) {
     res.status(401).json({ error: "Authentication is required." });
     return;
