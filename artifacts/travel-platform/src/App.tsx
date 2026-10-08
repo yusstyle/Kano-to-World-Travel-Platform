@@ -110,7 +110,6 @@ function Header() {
     { href: '/gallery', text: 'Gallery' },
     { href: '/faq', text: 'FAQ' },
     { href: '/about', text: 'Our story' },
-    { href: '/admin', text: 'Admin' },
   ];
   return <header className="topbar" style={{ position: 'relative', zIndex: 30, background: '#f8f5ee', borderBottom: '1px solid #e6ded1' }}>
     <div className="site-wrap" style={{ minHeight: 82, padding: '0 clamp(1rem,5vw,4.5rem)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
@@ -120,7 +119,7 @@ function Header() {
       </Link>
       <button className="menu-toggle btn-outline" onClick={() => setOpen(!open)} aria-label={open ? 'Close navigation' : 'Open navigation'} data-testid="button-menu" style={{ padding: 10, border: 0 }}>{open ? <X size={21}/> : <Menu size={21}/>}</button>
       <nav className={`nav-items ${open ? 'open' : ''}`} aria-label="Main navigation" style={{ alignItems: 'center', gap: 'clamp(14px,2.2vw,32px)' }}>
-        {nav.map(item => <Link key={item.href} href={item.href} className="nav-link" data-testid={`link-nav-${item.text.toLowerCase().replaceAll(' ','-')}`} onClick={() => setOpen(false)} style={{ fontSize: 12, color: location === item.href ? '#987441' : (item.href === '/admin' ? '#8a652f' : '#4a433a'), fontWeight: item.href === '/admin' ? 500 : 400 }}>{item.text}</Link>)}
+        {nav.map(item => <Link key={item.href} href={item.href} className="nav-link" data-testid={`link-nav-${item.text.toLowerCase().replaceAll(' ','-')}`} onClick={() => setOpen(false)} style={{ fontSize: 12, color: location === item.href ? '#987441' : '#4a433a' }}>{item.text}</Link>)}
         {clerkEnabled && <>
           <Show when="signed-out"><Link href="/sign-in" className="nav-link" data-testid="link-sign-in" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Sign in</Link><Link href="/sign-up" className="nav-link" data-testid="link-sign-up" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Create account</Link></Show>
           <Show when="signed-in"><Link href="/account" className="nav-link" data-testid="link-account" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>My account</Link></Show>
@@ -151,7 +150,6 @@ function Footer() {
           <Link href="/blog" data-testid="link-footer-blog" style={{ color: '#eee5d8', textDecoration: 'none' }}>Travel Stories</Link>
           <Link href="/gallery" data-testid="link-footer-gallery" style={{ color: '#eee5d8', textDecoration: 'none' }}>Visual Archive</Link>
           <Link href="/faq" data-testid="link-footer-faq" style={{ color: '#eee5d8', textDecoration: 'none' }}>FAQ</Link>
-          <Link href="/admin" data-testid="link-footer-admin" style={{ color: '#c5a673', textDecoration: 'none', fontWeight: 500 }}>Admin Portal</Link>
           <Link href="/about" data-testid="link-footer-about" style={{ color: '#eee5d8', textDecoration: 'none' }}>Our story</Link>
           <Link href="/contact" data-testid="link-footer-contact" style={{ color: '#eee5d8', textDecoration: 'none' }}>Contact</Link>
         </div></div>
