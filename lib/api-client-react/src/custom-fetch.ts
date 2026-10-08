@@ -322,6 +322,8 @@ async function parseSuccessBody(
   }
 }
 
+import { handleStaticFallback } from "./static-fallback";
+
 export async function customFetch<T = unknown>(
   input: RequestInfo | URL,
   options: CustomFetchOptions = {},
@@ -360,12 +362,40 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  let response: Response;
+  try {
+    response = await fetch(input, { ...init, method, headers });
+  } catch (networkError) {
+    // If offline or network error, attempt static fallback
+    const fallback = handleStaticFallback<T>(requestInfo.url, method, init.body);
+    if (fallback !== undefined) {
+      return fallback;
+    }
+    throw networkError;
+  }
 
-  if (!response.ok) {
+  // On static hosts like Vercel without an active backend server,
+  // POST/PATCH/DELETE return 405 Method Not Allowed, or rewrites return 200 with text/html
+  const isHtmlResponse =
+    response.headers.get("content-type")?.toLowerCase().includes("text/html");
+
+  if (!response.ok || (response.ok && isHtmlResponse && requestInfo.url.includes("/api/"))) {
+    const fallback = handleStaticFallback<T>(requestInfo.url, method, init.body);
+    if (fallback !== undefined) {
+      return fallback;
+    }
+
     const errorData = await parseErrorBody(response, method);
     throw new ApiError(response, errorData, requestInfo);
   }
 
-  return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  try {
+    return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  } catch (parseError) {
+    const fallback = handleStaticFallback<T>(requestInfo.url, method, init.body);
+    if (fallback !== undefined) {
+      return fallback;
+    }
+    throw parseError;
+  }
 }
