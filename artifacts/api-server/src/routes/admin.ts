@@ -1,3 +1,5 @@
+import path from "node:path";
+import fs from "node:fs";
 import { Router, type IRouter } from "express";
 import {
   asc,
@@ -33,6 +35,74 @@ const router: IRouter = Router();
 
 // Apply requireAdmin to all /admin routes
 router.use("/admin", requireAdmin);
+
+// ==================== IMAGE UPLOAD ====================
+router.post("/admin/upload", async (req, res): Promise<void> => {
+  try {
+    const { filename, data } = req.body ?? {};
+
+    if (!data || typeof data !== "string") {
+      res.status(400).json({ error: "Missing image data payload." });
+      return;
+    }
+
+    let base64Data = data;
+    let ext = ".jpg";
+
+    const match = data.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,(.+)$/);
+    if (match) {
+      const mimeSub = match[1].toLowerCase();
+      if (mimeSub === "png") ext = ".png";
+      else if (mimeSub === "webp") ext = ".webp";
+      else if (mimeSub === "gif") ext = ".gif";
+      else if (mimeSub === "svg+xml") ext = ".svg";
+      else ext = ".jpg";
+      base64Data = match[2];
+    } else if (filename && typeof filename === "string") {
+      const parsedExt = path.extname(filename).toLowerCase();
+      if ([".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"].includes(parsedExt)) {
+        ext = parsedExt === ".jpeg" ? ".jpg" : parsedExt;
+      }
+    }
+
+    const buffer = Buffer.from(base64Data, "base64");
+    if (buffer.length === 0) {
+      res.status(400).json({ error: "Uploaded image content is empty." });
+      return;
+    }
+
+    if (buffer.length > 25 * 1024 * 1024) {
+      res.status(400).json({ error: "Image size exceeds the 25MB limit." });
+      return;
+    }
+
+    const safeBaseName = (filename ? path.basename(filename, path.extname(filename)) : "upload")
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, "-")
+      .slice(0, 40) || "upload";
+
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const finalFilename = `${safeBaseName}-${uniqueId}${ext}`;
+
+    const uploadsDir = path.resolve(process.cwd(), "artifacts/travel-platform/public/uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const targetFilePath = path.join(uploadsDir, finalFilename);
+    await fs.promises.writeFile(targetFilePath, buffer);
+
+    const publicUrl = `/uploads/${finalFilename}`;
+    res.status(201).json({
+      url: publicUrl,
+      filename: finalFilename,
+      size: buffer.length,
+    });
+  } catch (error) {
+    req.log.error({ err: error }, "Failed to process image upload");
+    res.status(500).json({ error: "Image could not be saved." });
+  }
+});
 
 // ==================== TOURS CMS ====================
 router.get("/admin/tours", async (_req, res): Promise<void> => {

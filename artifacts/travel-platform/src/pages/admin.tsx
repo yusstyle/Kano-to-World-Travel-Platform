@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { FormEvent, ChangeEvent } from 'react';
 import { Link } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -45,6 +45,8 @@ import {
   LogIn,
   LogOut,
   Shield,
+  Upload,
+  ImageIcon,
 } from 'lucide-react';
 
 type AdminTab = 'overview' | 'tours' | 'destinations' | 'bookings' | 'inquiries' | 'content';
@@ -532,9 +534,12 @@ export default function AdminPage() {
                       <input className="field" value={tourForm.priceCurrency} onChange={e => setTourForm(f => ({ ...f, priceCurrency: e.target.value }))} placeholder="USD" style={{ display: 'block', marginTop: 6 }} />
                     </label>
                   </div>
-                  <label style={{ fontSize: 12 }}>Image URL or Path
-                    <input className="field" required value={tourForm.imageUrl} onChange={e => setTourForm(f => ({ ...f, imageUrl: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
-                  </label>
+                  <ImageUploadField
+                    label="Journey Cover Image"
+                    required
+                    value={tourForm.imageUrl}
+                    onChange={url => setTourForm(f => ({ ...f, imageUrl: url }))}
+                  />
                   <label style={{ fontSize: 12 }}>Summary
                     <textarea className="field" rows={2} required value={tourForm.summary} onChange={e => setTourForm(f => ({ ...f, summary: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
                   </label>
@@ -611,9 +616,12 @@ export default function AdminPage() {
                       <input className="field" value={destForm.region} onChange={e => setDestForm(f => ({ ...f, region: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
                     </label>
                   </div>
-                  <label style={{ fontSize: 12 }}>Image URL or Path
-                    <input className="field" required value={destForm.imageUrl} onChange={e => setDestForm(f => ({ ...f, imageUrl: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
-                  </label>
+                  <ImageUploadField
+                    label="Destination Hero Image"
+                    required
+                    value={destForm.imageUrl}
+                    onChange={url => setDestForm(f => ({ ...f, imageUrl: url }))}
+                  />
                   <label style={{ fontSize: 12 }}>Best Time to Visit
                     <input className="field" value={destForm.bestTimeToVisit} onChange={e => setDestForm(f => ({ ...f, bestTimeToVisit: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
                   </label>
@@ -750,9 +758,12 @@ export default function AdminPage() {
                 <label style={{ fontSize: 12 }}>Founder Biography
                   <textarea className="field" rows={5} required minLength={10} maxLength={5000} value={founderForm.founderBio} onChange={e => setFounderForm(f => ({ ...f, founderBio: e.target.value }))} style={{ display: 'block', marginTop: 6, resize: 'vertical' }} />
                 </label>
-                <label style={{ fontSize: 12 }}>Founder Image URL or Path
-                  <input className="field" required value={founderForm.founderImageUrl} onChange={e => setFounderForm(f => ({ ...f, founderImageUrl: e.target.value }))} placeholder="/kano-editorial.jpg" style={{ display: 'block', marginTop: 6 }} />
-                </label>
+                <ImageUploadField
+                  label="Founder Portrait Photograph"
+                  required
+                  value={founderForm.founderImageUrl}
+                  onChange={url => setFounderForm(f => ({ ...f, founderImageUrl: url }))}
+                />
                 <button type="submit" className="btn-dark" disabled={updateContent.isPending} style={{ justifySelf: 'start' }}>
                   {updateContent.isPending ? 'Saving…' : 'Save Founder Content'} <Check size={14} />
                 </button>
@@ -790,9 +801,12 @@ export default function AdminPage() {
                   <label style={{ fontSize: 12 }}>Location
                     <input className="field" required value={galleryForm.location} onChange={e => setGalleryForm(f => ({ ...f, location: e.target.value }))} placeholder="e.g. Kano, Nigeria" style={{ display: 'block', marginTop: 6 }} />
                   </label>
-                  <label style={{ fontSize: 12 }}>Image URL or Path
-                    <input className="field" required value={galleryForm.imageUrl} onChange={e => setGalleryForm(f => ({ ...f, imageUrl: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
-                  </label>
+                  <ImageUploadField
+                    label="Archive Photograph"
+                    required
+                    value={galleryForm.imageUrl}
+                    onChange={url => setGalleryForm(f => ({ ...f, imageUrl: url }))}
+                  />
                   <label style={{ fontSize: 12 }}>Category
                     <input className="field" required value={galleryForm.category} onChange={e => setGalleryForm(f => ({ ...f, category: e.target.value }))} placeholder="Craft, Architecture, Culture..." style={{ display: 'block', marginTop: 6 }} />
                   </label>
@@ -897,5 +911,171 @@ function AdminLoginForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
       </div>
     </main>
+  );
+}
+
+interface ImageUploadFieldProps {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  required?: boolean;
+}
+
+function ImageUploadField({ label, value, onChange, required = false }: ImageUploadFieldProps) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file (JPEG, PNG, WebP, GIF, SVG).');
+      return;
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
+      setUploadError('Image size exceeds 25MB limit.');
+      return;
+    }
+
+    setUploading(true);
+    setUploadError('');
+
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const dataUri = await base64Promise;
+
+      const token = localStorage.getItem('admin_token');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          filename: file.name,
+          data: dataUri,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to upload image.');
+      }
+
+      const result = await res.json();
+      onChange(result.url);
+    } catch (err: any) {
+      setUploadError(err.message || 'Error uploading image.');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div style={{ display: 'grid', gap: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: 12, fontWeight: 500, color: '#383028' }}>{label}</span>
+        <button
+          type="button"
+          onClick={() => setShowUrlInput(!showUrlInput)}
+          style={{ background: 'none', border: 'none', color: '#8a652f', fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}
+        >
+          {showUrlInput ? 'Upload file instead' : 'Enter URL manually'}
+        </button>
+      </div>
+
+      {showUrlInput ? (
+        <input
+          type="text"
+          className="field"
+          required={required}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="e.g. /kano-editorial.jpg or https://..."
+          style={{ display: 'block' }}
+        />
+      ) : (
+        <div style={{ display: 'grid', gap: 10 }}>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              border: '2px dashed #d5c8b6',
+              background: '#fbf9f4',
+              padding: '16px 14px',
+              textAlign: 'center',
+              cursor: 'pointer',
+              borderRadius: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#ede3d3', display: 'grid', placeItems: 'center', color: '#8a652f' }}>
+              <Upload size={16} />
+            </div>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#28231e' }}>
+              {uploading ? 'Uploading image to server…' : 'Choose image to upload from your computer'}
+            </p>
+            <p style={{ margin: 0, fontSize: 11, color: '#7a7063' }}>
+              Supports JPG, PNG, WebP, GIF, SVG (up to 25MB)
+            </p>
+          </div>
+
+          {uploadError && (
+            <p role="alert" style={{ color: '#983e31', fontSize: 12, margin: 0 }}>
+              {uploadError}
+            </p>
+          )}
+
+          {value && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '1px solid #dfd3c3', padding: 8 }}>
+              <img
+                src={value}
+                alt="Uploaded preview"
+                style={{ width: 56, height: 56, objectFit: 'cover', border: '1px solid #d8cdbd' }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#28231e' }}>
+                  {value}
+                </p>
+                <p style={{ margin: '2px 0 0', fontSize: 11, color: '#326830', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <Check size={12} /> Image ready
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="btn-outline"
+                style={{ fontSize: 11, padding: '5px 10px' }}
+              >
+                Change
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
