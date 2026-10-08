@@ -1,4 +1,10 @@
 {
   "buildCommand": "pnpm --filter @workspace/travel-platform build",
-  "outputDirectory": "artifacts/travel-platform/dist/public"
+  "outputDirectory": "artifacts/travel-platform/dist/public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
