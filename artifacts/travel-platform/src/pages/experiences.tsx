@@ -56,16 +56,12 @@ export default function ExperiencesPage() {
           {experiences.map((exp, index) => (
             <div
               key={exp.title}
+              className={`experience-card ${index % 2 !== 0 ? 'reverse' : ''}`}
               style={{
-                display: 'grid',
-                gridTemplateColumns: index % 2 === 0 ? 'minmax(280px, 1fr) 1.2fr' : '1.2fr minmax(280px, 1fr)',
-                gap: 'clamp(28px, 6vw, 72px)',
-                alignItems: 'center',
-                paddingBottom: 48,
                 borderBottom: index < experiences.length - 1 ? '1px solid #dcd1c2' : 'none',
               }}
             >
-              <div style={{ order: index % 2 === 0 ? 1 : 2, height: 380, overflow: 'hidden', background: '#d5c8b6' }}>
+              <div className="exp-image" style={{ order: index % 2 === 0 ? 1 : 2 }}>
                 <img
                   src={exp.image}
                   alt={exp.title}
@@ -73,7 +69,7 @@ export default function ExperiencesPage() {
                 />
               </div>
 
-              <div style={{ order: index % 2 === 0 ? 2 : 1 }}>
+              <div className="exp-content" style={{ order: index % 2 === 0 ? 2 : 1 }}>
                 <p className="eyebrow" style={{ color: '#9b7642' }}>{exp.eyebrow}</p>
                 <h2 className="serif" style={{ fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', fontWeight: 400, margin: '10px 0 16px', lineHeight: 1.15 }}>
                   {exp.title}

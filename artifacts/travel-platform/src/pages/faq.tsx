@@ -83,7 +83,7 @@ export default function FaqPage() {
                                 background: 'transparent',
                                 border: 0,
                                 cursor: 'pointer',
-                                padding: 0,
+                                padding: '12px 0',
                                 gap: 16,
                               }}
                             >

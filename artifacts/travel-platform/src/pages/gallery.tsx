@@ -56,7 +56,7 @@ export default function GalleryPage() {
           )}
 
           {query.isLoading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="skeleton" style={{ height: 320 }} />
               ))}
@@ -73,7 +73,7 @@ export default function GalleryPage() {
               <p style={{ color: '#6c6152' }}>Select another category to view images.</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
               {filtered.map(img => (
                 <div
                   key={img.id}
@@ -129,7 +129,7 @@ export default function GalleryPage() {
             zIndex: 100,
             display: 'grid',
             placeItems: 'center',
-            padding: 24,
+            padding: 'clamp(12px, 3vw, 24px)',
           }}
         >
           <div
@@ -140,6 +140,9 @@ export default function GalleryPage() {
               background: '#f8f5ee',
               overflow: 'hidden',
               position: 'relative',
+              maxHeight: 'min(90vh, 760px)',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <button
@@ -147,12 +150,15 @@ export default function GalleryPage() {
               aria-label="Close image preview"
               style={{
                 position: 'absolute',
-                top: 14,
-                right: 14,
+                top: 12,
+                right: 12,
                 background: '#28231e',
                 color: '#fff',
                 border: 0,
-                padding: 8,
+                width: 38,
+                height: 38,
+                display: 'grid',
+                placeItems: 'center',
                 cursor: 'pointer',
                 zIndex: 10,
               }}
@@ -163,14 +169,14 @@ export default function GalleryPage() {
             <img
               src={activeImage.imageUrl}
               alt={activeImage.title}
-              style={{ width: '100%', maxHeight: '65vh', objectFit: 'cover' }}
+              style={{ width: '100%', maxHeight: '52vh', objectFit: 'contain', background: '#1c1713' }}
             />
 
-            <div style={{ padding: '24px 28px' }}>
+            <div style={{ padding: 'clamp(16px, 3vw, 26px)', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 16 }}>
                 <div>
                   <p className="eyebrow" style={{ color: '#9b7642', margin: 0 }}>{activeImage.location} · {activeImage.category}</p>
-                  <h2 className="serif" style={{ fontSize: 28, fontWeight: 400, margin: '6px 0 10px' }}>{activeImage.title}</h2>
+                  <h2 className="serif" style={{ fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 400, margin: '6px 0 10px' }}>{activeImage.title}</h2>
                 </div>
               </div>
               {activeImage.caption && (

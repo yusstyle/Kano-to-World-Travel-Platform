@@ -341,7 +341,7 @@ export default function AdminPage() {
 
       {/* Tab Navigation */}
       <div style={{ background: '#eee8dc', borderBottom: '1px solid #d8cdbd' }}>
-        <div className="site-wrap" style={{ display: 'flex', gap: 4, overflowX: 'auto', padding: '0 1rem' }}>
+        <div className="site-wrap admin-tabs-scroll">
           {[
             { id: 'overview', label: 'Overview', icon: <Compass size={14} /> },
             { id: 'tours', label: `Tours (${tours.length})`, icon: <MapPin size={14} /> },
@@ -388,7 +388,7 @@ export default function AdminPage() {
         {/* ==================== TAB: OVERVIEW ==================== */}
         {tab === 'overview' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 18, marginBottom: 36 }}>
+            <div className="admin-stats-grid">
               {[
                 { label: 'Published Tours', count: tours.length, icon: <MapPin size={22} color="#9b7642" /> },
                 { label: 'Destinations', count: destinations.length, icon: <Layers size={22} color="#9b7642" /> },
@@ -415,7 +415,7 @@ export default function AdminPage() {
               {!bookings.length ? (
                 <p style={{ color: '#726759', fontSize: 14 }}>No bookings submitted yet.</p>
               ) : (
-                <div style={{ overflowX: 'auto' }}>
+                <div className="table-scroll-wrap">
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left', color: '#887d70' }}>
@@ -447,11 +447,11 @@ export default function AdminPage() {
         {/* ==================== TAB: TOURS CMS ==================== */}
         {tab === 'tours' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.35fr) minmax(320px, 0.9fr)', gap: 32, alignItems: 'start' }}>
+            <div className="admin-split-grid">
               {/* Tours Table */}
               <div style={{ background: '#fff', border: '1px solid #ddd1bf', padding: 24 }}>
                 <h2 className="serif" style={{ fontSize: 26, fontWeight: 400, margin: '0 0 18px' }}>Published Journeys</h2>
-                <div style={{ overflowX: 'auto' }}>
+                <div className="table-scroll-wrap">
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left', color: '#887d70' }}>
@@ -499,7 +499,7 @@ export default function AdminPage() {
                   <label style={{ fontSize: 12 }}>Slug
                     <input className="field" required value={tourForm.slug} onChange={e => setTourForm(f => ({ ...f, slug: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="form-row-2col">
                     <label style={{ fontSize: 12 }}>Destination
                       <select className="field" value={tourForm.destinationId} onChange={e => setTourForm(f => ({ ...f, destinationId: Number(e.target.value) }))} style={{ display: 'block', marginTop: 6 }}>
                         {destinations.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -509,7 +509,7 @@ export default function AdminPage() {
                       <input className="field" type="number" min={1} required value={tourForm.durationDays} onChange={e => setTourForm(f => ({ ...f, durationDays: Number(e.target.value) }))} style={{ display: 'block', marginTop: 6 }} />
                     </label>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="form-row-2col">
                     <label style={{ fontSize: 12 }}>Category
                       <select className="field" value={tourForm.category} onChange={e => setTourForm(f => ({ ...f, category: e.target.value }))} style={{ display: 'block', marginTop: 6 }}>
                         <option value="Historical & Heritage">Historical & Heritage</option>
@@ -526,7 +526,7 @@ export default function AdminPage() {
                       </select>
                     </label>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 12 }}>
+                  <div className="form-row-2col">
                     <label style={{ fontSize: 12 }}>Price Amount (Optional)
                       <input className="field" type="number" value={tourForm.priceAmount} onChange={e => setTourForm(f => ({ ...f, priceAmount: e.target.value }))} placeholder="e.g. 450" style={{ display: 'block', marginTop: 6 }} />
                     </label>
@@ -558,11 +558,11 @@ export default function AdminPage() {
         {/* ==================== TAB: DESTINATIONS CMS ==================== */}
         {tab === 'destinations' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.35fr) minmax(320px, 0.9fr)', gap: 32, alignItems: 'start' }}>
+            <div className="admin-split-grid">
               {/* Destinations Table */}
               <div style={{ background: '#fff', border: '1px solid #ddd1bf', padding: 24 }}>
                 <h2 className="serif" style={{ fontSize: 26, fontWeight: 400, margin: '0 0 18px' }}>Destinations</h2>
-                <div style={{ overflowX: 'auto' }}>
+                <div className="table-scroll-wrap">
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left', color: '#887d70' }}>
@@ -608,7 +608,7 @@ export default function AdminPage() {
                   <label style={{ fontSize: 12 }}>Slug
                     <input className="field" required value={destForm.slug} onChange={e => setDestForm(f => ({ ...f, slug: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="form-row-2col">
                     <label style={{ fontSize: 12 }}>Country
                       <input className="field" required value={destForm.country} onChange={e => setDestForm(f => ({ ...f, country: e.target.value }))} style={{ display: 'block', marginTop: 6 }} />
                     </label>
@@ -644,7 +644,7 @@ export default function AdminPage() {
             {!bookings.length ? (
               <p style={{ color: '#726759', padding: 20 }}>No customer bookings received yet.</p>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
+              <div className="table-scroll-wrap">
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left', color: '#887d70' }}>
@@ -771,7 +771,7 @@ export default function AdminPage() {
             </div>
 
             {/* Quick Add FAQ & Gallery Forms */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
               {/* Add FAQ */}
               <div style={{ background: '#fff', border: '1px solid #ddd1bf', padding: 24 }}>
                 <h3 className="serif" style={{ fontSize: 20, fontWeight: 400, margin: '0 0 16px' }}>Add FAQ Item</h3>

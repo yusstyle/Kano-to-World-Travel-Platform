@@ -78,7 +78,7 @@ export default function BookingConfirmationPage() {
         </div>
 
         {/* Journey & Customer Summary Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, marginBottom: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, marginBottom: 28 }}>
           {/* Journey Card */}
           <div style={{ background: '#fff', border: '1px solid #d9cdbd', padding: 28 }}>
             <p className="eyebrow" style={{ color: '#9b7642' }}>Journey Particulars</p>
@@ -125,7 +125,7 @@ export default function BookingConfirmationPage() {
         </div>
 
         {/* Action Controls */}
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', background: '#eee8dc', padding: '18px 24px' }}>
+        <div className="booking-actions" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', background: '#eee8dc', padding: '18px 24px' }}>
           <button
             type="button"
             className="btn-outline"
