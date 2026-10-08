@@ -4,10 +4,29 @@ import { db, eq, userProfilesTable } from "@workspace/db";
 
 export function getSafeUserId(req: Request): string | null {
   try {
-    return getAuth(req).userId ?? null;
+    const clerkAuth = getAuth(req);
+    if (clerkAuth?.userId) return clerkAuth.userId;
   } catch {
-    return null;
+    // Clerk not mounted or user not signed in
   }
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.toLowerCase().startsWith("bearer ")) {
+    const token = authHeader.replace(/^bearer\s+/i, "").trim();
+    if (token.startsWith("admin-token-")) {
+      return token.replace("admin-token-", "");
+    }
+  }
+
+  const cookieHeader = req.headers.cookie;
+  if (cookieHeader) {
+    const match = cookieHeader.match(/admin_token=admin-token-([^;]+)/);
+    if (match?.[1]) {
+      return decodeURIComponent(match[1]);
+    }
+  }
+
+  return null;
 }
 
 export async function requireAdmin(

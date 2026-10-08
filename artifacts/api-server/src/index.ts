@@ -1,3 +1,9 @@
+try {
+  process.loadEnvFile();
+} catch {
+  // .env file is optional in production
+}
+
 import app from "./app";
 import { logger } from "./lib/logger";
 import { seedDemoContent } from "./seed";

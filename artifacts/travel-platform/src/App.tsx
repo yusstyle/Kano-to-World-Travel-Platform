@@ -8,14 +8,21 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import ExperiencesPage from '@/pages/experiences';
+import BlogPage from '@/pages/blog';
+import BlogDetailPage from '@/pages/blog-detail';
+import GalleryPage from '@/pages/gallery';
+import FaqPage from '@/pages/faq';
+import BookingConfirmationPage from '@/pages/booking-confirmation';
+import AdminPage from '@/pages/admin';
 import { Link, Redirect, Route, Router as WouterRouter, Switch, useLocation, useParams } from 'wouter';
-import { ArrowDown, ArrowLeft, ArrowRight, Check, Compass, Menu, Search, Send, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, Check, Compass, Menu, Search, Send, X, Calendar, Users, Clock } from 'lucide-react';
 import {
   getGetTourQueryKey, getGetDestinationQueryKey,
   useGetHome, useGetTours, useGetTour, useGetDestinations, useGetDestination,
   useHealthCheck, useSubmitContact, useSubscribeNewsletter,
   useGetAuthProfile, useInitializeAdmin, useGetAdminSiteContent,
-  useUpdateAdminSiteContent, getGetAuthProfileQueryKey,
+  useUpdateAdminSiteContent, useCreateBooking, getGetAuthProfileQueryKey,
   getGetAdminSiteContentQueryKey, getGetHomeQueryKey, setAuthTokenGetter,
 } from '@workspace/api-client-react';
 import type { Destination, DestinationDetail, Tour, TourCard } from '@workspace/api-client-react';
@@ -28,6 +35,13 @@ const clerkPubKey = clerkEnabled
   ? publishableKeyFromHost(window.location.hostname, configuredClerkKey)
   : '';
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+
+if (typeof window !== 'undefined') {
+  const savedAdminToken = localStorage.getItem('admin_token');
+  if (savedAdminToken) {
+    setAuthTokenGetter(async () => localStorage.getItem('admin_token'));
+  }
+}
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath)
@@ -89,8 +103,14 @@ function Header() {
   const [location] = useLocation();
   const health = useHealthCheck();
   const nav = [
-    { href: '/tours', text: 'Tours' }, { href: '/destinations', text: 'Destinations' },
+    { href: '/tours', text: 'Tours' },
+    { href: '/destinations', text: 'Destinations' },
+    { href: '/experiences', text: 'Experiences' },
+    { href: '/blog', text: 'Stories' },
+    { href: '/gallery', text: 'Gallery' },
+    { href: '/faq', text: 'FAQ' },
     { href: '/about', text: 'Our story' },
+    { href: '/admin', text: 'Admin' },
   ];
   return <header className="topbar" style={{ position: 'relative', zIndex: 30, background: '#f8f5ee', borderBottom: '1px solid #e6ded1' }}>
     <div className="site-wrap" style={{ minHeight: 82, padding: '0 clamp(1rem,5vw,4.5rem)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
@@ -99,13 +119,13 @@ function Header() {
         <span style={{ display: 'grid', lineHeight: 1.05 }}><span className="serif" style={{ fontSize: 16, letterSpacing: '.01em' }}>From Kano</span><span style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.2em', marginTop: 4 }}>to the world</span></span>
       </Link>
       <button className="menu-toggle btn-outline" onClick={() => setOpen(!open)} aria-label={open ? 'Close navigation' : 'Open navigation'} data-testid="button-menu" style={{ padding: 10, border: 0 }}>{open ? <X size={21}/> : <Menu size={21}/>}</button>
-      <nav className={`nav-items ${open ? 'open' : ''}`} aria-label="Main navigation" style={{ alignItems: 'center', gap: 'clamp(18px,3vw,42px)' }}>
-        {nav.map(item => <Link key={item.href} href={item.href} className="nav-link" data-testid={`link-nav-${item.text.toLowerCase().replaceAll(' ','-')}`} onClick={() => setOpen(false)} style={{ fontSize: 12, color: location === item.href ? '#987441' : '#4a433a' }}>{item.text}</Link>)}
+      <nav className={`nav-items ${open ? 'open' : ''}`} aria-label="Main navigation" style={{ alignItems: 'center', gap: 'clamp(14px,2.2vw,32px)' }}>
+        {nav.map(item => <Link key={item.href} href={item.href} className="nav-link" data-testid={`link-nav-${item.text.toLowerCase().replaceAll(' ','-')}`} onClick={() => setOpen(false)} style={{ fontSize: 12, color: location === item.href ? '#987441' : (item.href === '/admin' ? '#8a652f' : '#4a433a'), fontWeight: item.href === '/admin' ? 500 : 400 }}>{item.text}</Link>)}
         {clerkEnabled && <>
           <Show when="signed-out"><Link href="/sign-in" className="nav-link" data-testid="link-sign-in" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Sign in</Link><Link href="/sign-up" className="nav-link" data-testid="link-sign-up" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>Create account</Link></Show>
           <Show when="signed-in"><Link href="/account" className="nav-link" data-testid="link-account" onClick={() => setOpen(false)} style={{ fontSize: 12, color: '#4a433a' }}>My account</Link></Show>
         </>}
-        <Link href="/contact" className="btn-dark" data-testid="link-contact-nav" onClick={() => setOpen(false)} style={{ padding: '12px 17px' }}>Make an enquiry <ArrowRight size={14}/></Link>
+        <Link href="/contact" className="btn-dark" data-testid="link-contact-nav" onClick={() => setOpen(false)} style={{ padding: '10px 15px', fontSize: 12 }}>Make an enquiry <ArrowRight size={14}/></Link>
       </nav>
     </div>
     <span aria-hidden="true" data-testid="status-discovery-service" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}>{health.isError ? 'Discovery service unavailable' : 'Discovery service'}</span>
@@ -124,7 +144,17 @@ function Footer() {
     <div className="site-wrap">
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.2fr', gap: 48, paddingBottom: 60 }}>
         <div><p className="eyebrow" style={{ color: '#c3a574' }}>From Kano to the World</p><h2 className="serif" style={{ fontWeight: 400, fontSize: 32, lineHeight: 1.2, maxWidth: 370, margin: '17px 0' }}>A deeper way to meet a place.</h2><p style={{ color: '#c3b9aa', fontSize: 13, lineHeight: 1.8, maxWidth: 340 }}>Cultural and historical journeys shaped by a perspective rooted in Kano.</p></div>
-        <div><p className="eyebrow" style={{ color: '#c3a574' }}>Explore</p><div style={{ display: 'grid', gap: 15, marginTop: 20, fontSize: 13 }}><Link href="/tours" data-testid="link-footer-tours" style={{ color: '#eee5d8', textDecoration: 'none' }}>Tours</Link><Link href="/destinations" data-testid="link-footer-destinations" style={{ color: '#eee5d8', textDecoration: 'none' }}>Destinations</Link><Link href="/about" data-testid="link-footer-about" style={{ color: '#eee5d8', textDecoration: 'none' }}>Our story</Link><Link href="/contact" data-testid="link-footer-contact" style={{ color: '#eee5d8', textDecoration: 'none' }}>Contact</Link></div></div>
+        <div><p className="eyebrow" style={{ color: '#c3a574' }}>Explore</p><div style={{ display: 'grid', gap: 12, marginTop: 18, fontSize: 13 }}>
+          <Link href="/tours" data-testid="link-footer-tours" style={{ color: '#eee5d8', textDecoration: 'none' }}>Tours</Link>
+          <Link href="/destinations" data-testid="link-footer-destinations" style={{ color: '#eee5d8', textDecoration: 'none' }}>Destinations</Link>
+          <Link href="/experiences" data-testid="link-footer-experiences" style={{ color: '#eee5d8', textDecoration: 'none' }}>Experiences</Link>
+          <Link href="/blog" data-testid="link-footer-blog" style={{ color: '#eee5d8', textDecoration: 'none' }}>Travel Stories</Link>
+          <Link href="/gallery" data-testid="link-footer-gallery" style={{ color: '#eee5d8', textDecoration: 'none' }}>Visual Archive</Link>
+          <Link href="/faq" data-testid="link-footer-faq" style={{ color: '#eee5d8', textDecoration: 'none' }}>FAQ</Link>
+          <Link href="/admin" data-testid="link-footer-admin" style={{ color: '#c5a673', textDecoration: 'none', fontWeight: 500 }}>Admin Portal</Link>
+          <Link href="/about" data-testid="link-footer-about" style={{ color: '#eee5d8', textDecoration: 'none' }}>Our story</Link>
+          <Link href="/contact" data-testid="link-footer-contact" style={{ color: '#eee5d8', textDecoration: 'none' }}>Contact</Link>
+        </div></div>
         <div><p className="eyebrow" style={{ color: '#c3a574' }}>Letters from the road</p><p style={{ color: '#c3b9aa', fontSize: 13, lineHeight: 1.7 }}>Occasional notes on places, people and the histories that stay with us.</p>
           <form onSubmit={submit} style={{ display: 'flex', gap: 8, marginTop: 18 }}><label className="sr-only" htmlFor="newsletter-email">Email address</label><input id="newsletter-email" className="field" type="email" required placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} data-testid="input-newsletter-email" style={{ background: '#332d27', color: '#f6f1e8', borderColor: '#61564a' }}/><button className="btn-gold" disabled={newsletter.isPending} aria-label="Subscribe to newsletter" data-testid="button-newsletter-submit" style={{ padding: '0 16px' }}>{newsletter.isPending ? 'Sending' : <Send size={16}/>}</button></form>
           {receipt && <p role="status" data-testid="status-newsletter-success" style={{ color: '#d5c29f', fontSize: 12, marginTop: 10 }}>{receipt}</p>}
@@ -250,14 +280,103 @@ function TourDetailPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug ?? '';
   const tour = useGetTour(slug, { query: { queryKey: getGetTourQueryKey(slug), enabled: Boolean(slug) } });
+  const createBooking = useCreateBooking();
+  const [, setLocation] = useLocation();
+
+  const [bookingForm, setBookingForm] = useState({
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    travelDate: '',
+    travelers: 2,
+    specialRequests: '',
+  });
+  const [bookingError, setBookingError] = useState('');
+
   if (tour.isLoading) return <Shell><main className="section-pad"><LoadingCards/></main></Shell>;
   if (tour.isError || !tour.data) return <Shell><main className="section-pad"><ErrorState retry={() => tour.refetch()} label="This journey could not be found."/></main></Shell>;
   const item: Tour = tour.data;
   const inquiryParams = new URLSearchParams(window.location.search);
   inquiryParams.set('subject', item.title);
+
+  const handleBookingSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setBookingError('');
+    createBooking.mutate({
+      data: {
+        tourId: item.id,
+        customerName: bookingForm.customerName.trim(),
+        customerEmail: bookingForm.customerEmail.trim(),
+        customerPhone: bookingForm.customerPhone.trim() || null,
+        travelDate: bookingForm.travelDate,
+        travelers: Number(bookingForm.travelers),
+        specialRequests: bookingForm.specialRequests.trim() || null,
+      },
+    }, {
+      onSuccess: (result) => {
+        setLocation(`/booking-confirmation/${result.bookingReference}`);
+      },
+      onError: (err: any) => {
+        setBookingError(err?.message || 'Could not submit reservation. Please check details and try again.');
+      },
+    });
+  };
+
+  const estimatedTotal = item.priceAmount ? Number(item.priceAmount) * bookingForm.travelers : null;
+
   return <Shell><main>
-    <section className="hero-image" style={{ minHeight: 570, backgroundImage: `linear-gradient(90deg,rgba(25,21,17,.75),rgba(25,21,17,.18)),url("${item.imageUrl}")`, display: 'flex', alignItems: 'end', color: '#fff' }}><div style={{ padding: '70px clamp(1.25rem,8vw,8rem)', width: '100%' }}><Link href="/tours" data-testid="link-back-tours" style={{ color: '#eee4d3', textDecoration: 'none', display: 'inline-flex', gap: 8, alignItems: 'center', fontSize: 12, marginBottom: 36 }}><ArrowLeft size={14}/> All tours</Link><p className="eyebrow" style={{ color: '#d7b982' }}>{item.destination}, {item.country}</p><h1 className="serif" style={{ fontSize: 'clamp(3rem,7vw,6.5rem)', lineHeight: 1, fontWeight: 400, maxWidth: 900, margin: '14px 0 20px' }}>{item.title}</h1><div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}><DemoMarker demo={item.isDemo}/><span className="status-pill">{item.isDemo ? 'Illustrative only · not for sale' : item.availabilityStatus === 'unavailable' ? 'Currently unavailable' : item.availabilityStatus === 'scheduled' ? 'Scheduled' : 'Enquire for details'}</span></div></div></section>
-     <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.45fr) minmax(240px,.55fr)', gap: 'clamp(30px,8vw,110px)' }}><div><p className="eyebrow">{item.category} · {item.durationDays} days · {item.tourType}</p><h2 className="serif" style={{ fontSize: 37, fontWeight: 400, lineHeight: 1.2 }}>{item.summary}</h2><p style={{ color: '#655d53', lineHeight: 1.9, whiteSpace: 'pre-line' }}>{item.description}</p>{item.highlights?.length > 0 && <div style={{ marginTop: 44 }}><h3 className="serif" style={{ fontSize: 28, fontWeight: 400 }}>The story in brief</h3><ul style={{ paddingLeft: 20, color: '#655d53', lineHeight: 2 }}>{item.highlights.map((h,i) => <li key={i} data-testid={`text-tour-highlight-${i}`}>{h}</li>)}</ul></div>}</div><aside style={{ alignSelf: 'start', border: '1px solid #d9cebd', padding: 25, background: '#f1ebdf' }}><p className="eyebrow">Journey notes</p><p style={{ fontSize: 13, lineHeight: 1.8, color: '#5f5548' }}>{item.durationDays} days<br/>{item.destination}, {item.country}<br/>{item.tourType} format</p>{item.priceAmount !== null && item.priceCurrency && !item.isDemo && <p style={{ color: '#5f5548' }}>Published price: {new Intl.NumberFormat(undefined,{style:'currency',currency:item.priceCurrency}).format(item.priceAmount)}</p>}<p style={{ color: '#7d6b4f', fontSize: 12, lineHeight: 1.7 }}>{item.isDemo ? 'This is illustrative sample content, not an offer for sale.' : 'For current details, send an inquiry. No booking is made on this page.'}</p><Link href={`/contact?${inquiryParams.toString()}`} className="btn-dark" data-testid="link-tour-inquiry" style={{ width: '100%', boxSizing: 'border-box', marginTop: 12 }}>Ask about this journey <ArrowRight size={14}/></Link></aside></div></section>
+    <section className="hero-image" style={{ minHeight: 570, backgroundImage: `linear-gradient(90deg,rgba(25,21,17,.75),rgba(25,21,17,.18)),url("${item.imageUrl}")`, display: 'flex', alignItems: 'end', color: '#fff' }}><div style={{ padding: '70px clamp(1.25rem,8vw,8rem)', width: '100%' }}><Link href="/tours" data-testid="link-back-tours" style={{ color: '#eee4d3', textDecoration: 'none', display: 'inline-flex', gap: 8, alignItems: 'center', fontSize: 12, marginBottom: 36 }}><ArrowLeft size={14}/> All tours</Link><p className="eyebrow" style={{ color: '#d7b982' }}>{item.destination}, {item.country}</p><h1 className="serif" style={{ fontSize: 'clamp(3rem,7vw,6.5rem)', lineHeight: 1, fontWeight: 400, maxWidth: 900, margin: '14px 0 20px' }}>{item.title}</h1><div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}><DemoMarker demo={item.isDemo}/><span className="status-pill">{item.isDemo ? 'Illustrative only · not for sale' : item.availabilityStatus === 'unavailable' ? 'Currently unavailable' : item.availabilityStatus === 'scheduled' ? 'Scheduled' : 'Available for Reservation'}</span></div></div></section>
+     <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.4fr) minmax(280px,.6fr)', gap: 'clamp(30px,6vw,90px)' }}><div><p className="eyebrow">{item.category} · {item.durationDays} days · {item.tourType}</p><h2 className="serif" style={{ fontSize: 37, fontWeight: 400, lineHeight: 1.2 }}>{item.summary}</h2><p style={{ color: '#655d53', lineHeight: 1.9, whiteSpace: 'pre-line' }}>{item.description}</p>{item.highlights?.length > 0 && <div style={{ marginTop: 44 }}><h3 className="serif" style={{ fontSize: 28, fontWeight: 400 }}>The story in brief</h3><ul style={{ paddingLeft: 20, color: '#655d53', lineHeight: 2 }}>{item.highlights.map((h,i) => <li key={i} data-testid={`text-tour-highlight-${i}`}>{h}</li>)}</ul></div>}</div>
+     <aside style={{ alignSelf: 'start', border: '1px solid #d9cebd', padding: 25, background: '#f1ebdf' }}>
+       <p className="eyebrow">Journey notes</p>
+       <p style={{ fontSize: 13, lineHeight: 1.8, color: '#5f5548', margin: '4px 0 12px' }}>{item.durationDays} days · {item.destination}, {item.country} · {item.tourType} format</p>
+       {item.priceAmount !== null && item.priceCurrency && !item.isDemo && <p style={{ color: '#5f5548', fontSize: 13, margin: '0 0 16px' }}>Published price: <strong>{new Intl.NumberFormat(undefined,{style:'currency',currency:item.priceCurrency}).format(item.priceAmount)}</strong> / person</p>}
+       
+       <div style={{ borderTop: '1px solid #dcd1c0', paddingTop: 18 }}>
+         <p className="eyebrow" style={{ color: '#9b7642', marginBottom: 12 }}>Reserve this Journey</p>
+         <form onSubmit={handleBookingSubmit} style={{ display: 'grid', gap: 11 }}>
+           <label style={{ fontSize: 11 }}>Preferred Travel Date
+             <input className="field" type="date" required value={bookingForm.travelDate} onChange={e => setBookingForm(f => ({ ...f, travelDate: e.target.value }))} style={{ display: 'block', marginTop: 4, fontSize: 12 }} />
+           </label>
+           <label style={{ fontSize: 11 }}>Travelers
+             <select className="field" value={bookingForm.travelers} onChange={e => setBookingForm(f => ({ ...f, travelers: Number(e.target.value) }))} style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
+               {Array.from({ length: 10 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1} {i === 0 ? 'Traveler' : 'Travelers'}</option>)}
+             </select>
+           </label>
+           <label style={{ fontSize: 11 }}>Your Full Name
+             <input className="field" required minLength={2} value={bookingForm.customerName} onChange={e => setBookingForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Full Name" style={{ display: 'block', marginTop: 4, fontSize: 12 }} />
+           </label>
+           <label style={{ fontSize: 11 }}>Email Address
+             <input className="field" required type="email" value={bookingForm.customerEmail} onChange={e => setBookingForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="you@example.com" style={{ display: 'block', marginTop: 4, fontSize: 12 }} />
+           </label>
+           <label style={{ fontSize: 11 }}>Phone (Optional)
+             <input className="field" type="tel" value={bookingForm.customerPhone} onChange={e => setBookingForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="+234..." style={{ display: 'block', marginTop: 4, fontSize: 12 }} />
+           </label>
+           <label style={{ fontSize: 11 }}>Special Requests (Optional)
+             <textarea className="field" rows={2} value={bookingForm.specialRequests} onChange={e => setBookingForm(f => ({ ...f, specialRequests: e.target.value }))} placeholder="Interests, dietary, accessibility..." style={{ display: 'block', marginTop: 4, fontSize: 12 }} />
+           </label>
+
+           {estimatedTotal !== null && item.priceCurrency && (
+             <div style={{ background: '#e8e0d2', padding: '10px 12px', fontSize: 12, color: '#4a4135' }}>
+               Estimated Total ({bookingForm.travelers} pax): <strong>{new Intl.NumberFormat(undefined, { style: 'currency', currency: item.priceCurrency }).format(estimatedTotal)}</strong>
+             </div>
+           )}
+
+           {bookingError && <p role="alert" style={{ color: '#983e31', fontSize: 11, margin: 0 }}>{bookingError}</p>}
+
+           <button type="submit" className="btn-dark" disabled={createBooking.isPending} style={{ width: '100%', boxSizing: 'border-box', marginTop: 4 }} data-testid="button-reserve-tour">
+             {createBooking.isPending ? 'Submitting Reservation…' : 'Confirm Reservation Request'} <ArrowRight size={14} />
+           </button>
+         </form>
+       </div>
+
+       <div style={{ borderTop: '1px solid #dcd1c0', paddingTop: 12, marginTop: 16 }}>
+         <Link href={`/contact?${inquiryParams.toString()}`} style={{ fontSize: 12, color: '#6e6253', textDecoration: 'underline' }}>
+           Or make an informal enquiry instead
+         </Link>
+       </div>
+     </aside>
+     </div></section>
     {item.itinerary?.length > 0 && <section className="section-pad" style={{ background: '#eee8dc' }}><div className="site-wrap"><p className="eyebrow">The rhythm of the journey</p><h2 className="serif" style={{ fontWeight: 400, fontSize: 42, margin: '12px 0 34px' }}>Itinerary</h2><div style={{ maxWidth: 850 }}>{item.itinerary.map(day => <div key={day.day} data-testid={`row-itinerary-day-${day.day}`} style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: 20, padding: '22px 0', borderTop: '1px solid #d2c6b4' }}><span className="eyebrow">Day {day.day}</span><div><h3 className="serif" style={{ fontWeight: 400, fontSize: 24, margin: '0 0 8px' }}>{day.title}</h3><p style={{ color: '#6c6257', lineHeight: 1.7, margin: 0 }}>{day.description}</p><p style={{ color: '#987441', fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>{day.location}</p></div></div>)}</div></div></section>}
     {(item.included?.length > 0 || item.notIncluded?.length > 0) && <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>{[[item.included,'Included'],[item.notIncluded,'Not included']].map(([list,title],i) => <div key={i}><h3 className="serif" style={{ fontSize: 28, fontWeight: 400 }}>{title as string}</h3><ul style={{ paddingLeft: 20, color: '#655d53', lineHeight: 2 }}>{(list as string[]).map((v,j) => <li key={j}>{v}</li>)}</ul></div>)}</div></section>}
   </main></Shell>;
@@ -346,15 +465,29 @@ function Router() {
             ? ['Travel Destinations & Culture | From Kano to the World', 'Discover destinations through their histories, cultural context and travel notes, beginning in Kano, Nigeria.']
             : path.startsWith('/destinations/')
               ? [`${slug?.replace(/\b\w/g, (letter) => letter.toUpperCase()) ?? 'Destination'} Travel Guide | From Kano to the World`, 'Explore destination stories and cultural travel notes. Illustrative destinations are clearly marked as demo content.']
-              : path === '/about'
-                ? ['Our Story | Kano Cultural Travel | From Kano to the World', 'Meet the Kano-based cultural and history professional behind this travel perspective and explore the story that informs the journeys.']
-                : path === '/contact'
-                  ? ['Contact | Plan a Cultural Journey from Kano', 'Share your travel interests with From Kano to the World. An inquiry is not a booking or confirmation of availability or price.']
-                  : path === '/sign-in'
-                    ? ['Sign In | From Kano to the World', 'Sign in to your From Kano to the World account.']
-                    : path === '/sign-up'
-                      ? ['Create an Account | From Kano to the World', 'Create an account to keep your travel plans and inquiries together.']
-                      : ['Account | From Kano to the World', 'Manage your account and travel inquiries.'];
+              : path === '/experiences'
+                ? ['Curated Travel Experiences | From Kano to the World', 'Thematic perspectives and curated cultural experiences departing from Kano, Nigeria.']
+                : path === '/blog'
+                  ? ['Travel Journal & Heritage Stories | From Kano to the World', 'Essays, cultural reflections, and historical field notes exploring the caravan routes and living traditions of Kano.']
+                  : path.startsWith('/blog/')
+                    ? [`${slug?.replace(/\b\w/g, (letter) => letter.toUpperCase()) ?? 'Story'} | From Kano to the World`, 'Read field notes and cultural essays on Kano heritage and world travel.']
+                    : path === '/gallery'
+                      ? ['Visual Archive & Heritage Gallery | From Kano to the World', 'High-resolution photographic glimpses into Kano architecture, dyeing pits, Durbar pageantry, and Sahel landscapes.']
+                      : path === '/faq'
+                        ? ['Frequently Asked Questions | From Kano to the World', 'Planning guidance, cultural etiquette, booking procedures, and travel logistics for Kano and beyond.']
+                        : path.startsWith('/booking-confirmation/')
+                          ? ['Reservation Confirmed | From Kano to the World', 'Your reservation reference and trip summary details.']
+                          : path === '/admin'
+                            ? ['Management Portal | From Kano to the World', 'Administrative control over tours, destinations, bookings, and site content.']
+                            : path === '/about'
+                              ? ['Our Story | Kano Cultural Travel | From Kano to the World', 'Meet the Kano-based cultural and history professional behind this travel perspective and explore the story that informs the journeys.']
+                              : path === '/contact'
+                                ? ['Contact | Plan a Cultural Journey from Kano', 'Share your travel interests with From Kano to the World. An inquiry is not a booking or confirmation of availability or price.']
+                                : path === '/sign-in'
+                                  ? ['Sign In | From Kano to the World', 'Sign in to your From Kano to the World account.']
+                                  : path === '/sign-up'
+                                    ? ['Create an Account | From Kano to the World', 'Create an account to keep your travel plans and inquiries together.']
+                                    : ['Account | From Kano to the World', 'Manage your account and travel inquiries.'];
 
     document.title = titleAndDescription[0];
     const setMeta = (selector: string, value: string) => {
@@ -389,6 +522,12 @@ function Router() {
     <Route path="/tours/:slug" component={TourDetailPage}/>
     <Route path="/destinations" component={DestinationsPage}/>
     <Route path="/destinations/:slug" component={DestinationDetailPage}/>
+    <Route path="/experiences">{() => <Shell><ExperiencesPage /></Shell>}</Route>
+    <Route path="/blog">{() => <Shell><BlogPage /></Shell>}</Route>
+    <Route path="/blog/:slug">{() => <Shell><BlogDetailPage /></Shell>}</Route>
+    <Route path="/gallery">{() => <Shell><GalleryPage /></Shell>}</Route>
+    <Route path="/faq">{() => <Shell><FaqPage /></Shell>}</Route>
+    <Route path="/booking-confirmation/:reference">{() => <Shell><BookingConfirmationPage /></Shell>}</Route>
     <Route path="/contact" component={ContactPage}/>
     <Route path="/about" component={AboutPage}/>
     <Route path="/sign-in/*?" component={SignInPage}/>
@@ -407,10 +546,7 @@ function HomeRedirect() {
 }
 
 function AdminRoute() {
-  if (!clerkEnabled) {
-    return <Redirect to="/" />;
-  }
-  return <><Show when="signed-in"><AdminPage/></Show><Show when="signed-out"><Redirect to="/sign-in"/></Show></>;
+  return <Shell><AdminPage /></Shell>;
 }
 
 function AccountRoute() {
@@ -432,56 +568,6 @@ function SignUpPage() {
     return <Redirect to="/" />;
   }
   return <main className="auth-route"><Link href="/" className="auth-back-link" data-testid="link-auth-home">From Kano to the World</Link><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`}/></main>;
-}
-
-function AdminPage() {
-  const profile = useGetAuthProfile({ query: { queryKey: getGetAuthProfileQueryKey(), retry: false } });
-  const content = useGetAdminSiteContent({ query: { queryKey: getGetAdminSiteContentQueryKey(), retry: false } });
-  const updateContent = useUpdateAdminSiteContent();
-  const client = useQueryClient();
-  const [form, setForm] = useState({
-    founderName: '',
-    founderBio: '',
-    founderImageUrl: '',
-  });
-
-  useEffect(() => {
-    if (content.data) {
-      setForm(content.data);
-    }
-  }, [content.data]);
-
-  const save = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    updateContent.mutate({ data: form }, {
-      onSuccess: async () => {
-        await client.invalidateQueries({ queryKey: getGetHomeQueryKey() });
-      },
-    });
-  };
-
-  if (profile.isLoading || content.isLoading) {
-    return <Shell><main className="section-pad"><p role="status">Loading administrator tools…</p></main></Shell>;
-  }
-  if (profile.isError || content.isError || profile.data?.role !== 'admin') {
-    return <Shell><main className="section-pad"><div className="site-wrap"><p className="eyebrow">Admin access</p><h1 className="serif">Administrator access required.</h1><p style={{ color: '#62594e' }}>Sign in with an administrator account to edit this website.</p></div></main></Shell>;
-  }
-
-  return <Shell><main><PageIntro eyebrow="Content control" title="Website editor" text="Update the founder story and image shown across the public website. Changes are saved in the database and appear after the homepage refreshes."/>
-    <section className="section-pad" style={{ background: '#f8f5ee' }}><div className="site-wrap" style={{ maxWidth: 960 }}>
-      <div className="account-card">
-        <p className="eyebrow">Founder profile</p>
-        <h2 className="serif" style={{ fontSize: 37, fontWeight: 400, margin: '10px 0 24px' }}>Edit founder content</h2>
-        <form onSubmit={save} style={{ display: 'grid', gap: 18 }}>
-          <label style={{ fontSize: 12 }}>Founder name<input className="field" required minLength={2} maxLength={120} value={form.founderName} onChange={event => setForm(current => ({ ...current, founderName: event.target.value }))} data-testid="input-admin-founder-name" style={{ display: 'block', marginTop: 8 }}/></label>
-          <label style={{ fontSize: 12 }}>Founder biography<textarea className="field" required minLength={10} maxLength={5000} rows={7} value={form.founderBio} onChange={event => setForm(current => ({ ...current, founderBio: event.target.value }))} data-testid="input-admin-founder-bio" style={{ display: 'block', marginTop: 8, resize: 'vertical' }}/></label>
-          <label style={{ fontSize: 12 }}>Founder image URL or path<input className="field" required type="text" maxLength={2048} placeholder="e.g. /kano-editorial.jpg or https://..." value={form.founderImageUrl} onChange={event => setForm(current => ({ ...current, founderImageUrl: event.target.value }))} data-testid="input-admin-founder-image" style={{ display: 'block', marginTop: 8 }}/></label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}><button className="btn-dark" type="submit" disabled={updateContent.isPending} data-testid="button-admin-save-content">{updateContent.isPending ? 'Saving…' : 'Save founder content'} <Check size={14}/></button>{updateContent.isError && <p role="alert" style={{ color: '#983e31', fontSize: 12, margin: 0 }}>The content could not be saved. Check the image URL and try again.</p>}</div>
-          {form.founderImageUrl && <img src={form.founderImageUrl} alt="Founder preview" data-testid="img-admin-founder-preview" style={{ width: 180, height: 220, objectFit: 'cover', border: '1px solid #d8cdbd' }}/>} 
-        </form>
-      </div>
-    </div></section>
-  </main></Shell>;
 }
 
 function AccountPage() {

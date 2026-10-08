@@ -3,7 +3,7 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: Public discovery, inquiry, and authenticated account API for the From Kano to the World travel platform.
+  description: Public discovery, inquiry, content, booking, and administrator API for From Kano to the World.
 servers:
   - url: /api
     description: Base API path
@@ -12,10 +12,16 @@ tags:
     description: Health operations
   - name: discovery
     description: Public destinations, tours, and homepage content
+  - name: content
+    description: Public blog, gallery, and FAQ content
+  - name: bookings
+    description: Tour booking and confirmation
   - name: communication
     description: Contact inquiries and newsletter subscriptions
   - name: authentication
     description: Authenticated account profile and one-time administrator initialization
+  - name: admin
+    description: Administrative management operations
 paths:
   /healthz:
     get:
@@ -142,6 +148,118 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /blog:
+    get:
+      operationId: getBlogPosts
+      tags: [content]
+      summary: List published blog posts
+      responses:
+        "200":
+          description: List of blog posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlogPost"
+  /blog/{slug}:
+    get:
+      operationId: getBlogPost
+      tags: [content]
+      summary: Get a published blog post
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Blog post detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+        "404":
+          description: Blog post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /gallery:
+    get:
+      operationId: getGalleryImages
+      tags: [content]
+      summary: List gallery images
+      responses:
+        "200":
+          description: List of gallery images
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryImage"
+  /faqs:
+    get:
+      operationId: getFaqs
+      tags: [content]
+      summary: List FAQs
+      responses:
+        "200":
+          description: List of FAQs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FaqItem"
+  /bookings:
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Submit a tour booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingInput"
+      responses:
+        "201":
+          description: Booking submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /bookings/{reference}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Retrieve booking details
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /contact:
     post:
       operationId: submitContact
@@ -248,7 +366,7 @@ paths:
   /admin/site-content:
     get:
       operationId: getAdminSiteContent
-      tags: [authentication]
+      tags: [admin]
       summary: Load editable site content for an administrator
       responses:
         "200":
@@ -271,7 +389,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     put:
       operationId: updateAdminSiteContent
-      tags: [authentication]
+      tags: [admin]
       summary: Update founder content
       requestBody:
         required: true
@@ -286,6 +404,565 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SiteContent"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/tours:
+    get:
+      operationId: getAdminTours
+      tags: [admin]
+      summary: List all tours for admin
+      responses:
+        "200":
+          description: All tours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tour"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createAdminTour
+      tags: [admin]
+      summary: Create a tour
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TourInput"
+      responses:
+        "201":
+          description: Tour created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tour"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/tours/{id}:
+    put:
+      operationId: updateAdminTour
+      tags: [admin]
+      summary: Update a tour
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TourInput"
+      responses:
+        "200":
+          description: Tour updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tour"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteAdminTour
+      tags: [admin]
+      summary: Delete a tour
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/destinations:
+    get:
+      operationId: getAdminDestinations
+      tags: [admin]
+      summary: List all destinations for admin
+      responses:
+        "200":
+          description: All destinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DestinationDetail"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createAdminDestination
+      tags: [admin]
+      summary: Create a destination
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DestinationInput"
+      responses:
+        "201":
+          description: Destination created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationDetail"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/destinations/{id}:
+    put:
+      operationId: updateAdminDestination
+      tags: [admin]
+      summary: Update a destination
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DestinationInput"
+      responses:
+        "200":
+          description: Destination updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationDetail"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteAdminDestination
+      tags: [admin]
+      summary: Delete a destination
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/bookings:
+    get:
+      operationId: getAdminBookings
+      tags: [admin]
+      summary: List all bookings
+      responses:
+        "200":
+          description: Bookings list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/bookings/{id}:
+    patch:
+      operationId: updateAdminBookingStatus
+      tags: [admin]
+      summary: Update booking status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingStatusUpdate"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/inquiries:
+    get:
+      operationId: getAdminInquiries
+      tags: [admin]
+      summary: List all inquiries
+      responses:
+        "200":
+          description: Inquiries list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InquiryItem"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/inquiries/{id}:
+    patch:
+      operationId: updateAdminInquiryStatus
+      tags: [admin]
+      summary: Update inquiry status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryStatusUpdate"
+      responses:
+        "200":
+          description: Updated inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InquiryItem"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/blog:
+    post:
+      operationId: createAdminBlogPost
+      tags: [admin]
+      summary: Create a blog post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogPostInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPost"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/blog/{id}:
+    delete:
+      operationId: deleteAdminBlogPost
+      tags: [admin]
+      summary: Delete a blog post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/faqs:
+    post:
+      operationId: createAdminFaq
+      tags: [admin]
+      summary: Create a FAQ
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FaqInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FaqItem"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/faqs/{id}:
+    delete:
+      operationId: deleteAdminFaq
+      tags: [admin]
+      summary: Delete a FAQ
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/gallery:
+    post:
+      operationId: createAdminGalleryImage
+      tags: [admin]
+      summary: Add gallery image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GalleryImageInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryImage"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Administrator access required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /admin/gallery/{id}:
+    delete:
+      operationId: deleteAdminGalleryImage
+      tags: [admin]
+      summary: Delete gallery image
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionReceipt"
         "401":
           description: Authentication required
           content:
@@ -346,6 +1023,7 @@ components:
           items: { type: string }
         isFeatured: { type: boolean }
         isDemo: { type: boolean }
+        isPublished: { type: boolean }
       required:
         - id
         - slug
@@ -422,6 +1100,38 @@ components:
         total: { type: integer }
         totalPages: { type: integer }
       required: [items, page, pageSize, total, totalPages]
+    TourInput:
+      type: object
+      properties:
+        slug: { type: string, minLength: 2, maxLength: 100 }
+        title: { type: string, minLength: 3, maxLength: 200 }
+        destinationId: { type: integer }
+        durationDays: { type: integer, minimum: 1 }
+        category: { type: string, minLength: 2 }
+        tourType: { type: string, enum: [private, group, flexible] }
+        priceAmount: { type: ["number", "null"] }
+        priceCurrency: { type: ["string", "null"] }
+        availabilityStatus: { type: string, enum: [inquiry_only, scheduled, unavailable] }
+        imageUrl: { type: string, minLength: 1 }
+        summary: { type: string, minLength: 10 }
+        description: { type: string, minLength: 20 }
+        highlights:
+          type: array
+          items: { type: string }
+        itinerary:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItineraryDay"
+        included:
+          type: array
+          items: { type: string }
+        notIncluded:
+          type: array
+          items: { type: string }
+        isFeatured: { type: boolean }
+        isDemo: { type: boolean }
+        isPublished: { type: boolean }
+      required: [slug, title, destinationId, durationDays, category, tourType, imageUrl, summary, description]
     Destination:
       type: object
       properties:
@@ -451,6 +1161,29 @@ components:
             travelNotes: { type: ["string", "null"] }
             tourCount: { type: integer }
           required: [gallery, bestTimeToVisit, languages, currencyCode, travelNotes, tourCount]
+    DestinationInput:
+      type: object
+      properties:
+        slug: { type: string, minLength: 2, maxLength: 100 }
+        name: { type: string, minLength: 2, maxLength: 100 }
+        country: { type: string, minLength: 2, maxLength: 100 }
+        region: { type: ["string", "null"] }
+        description: { type: string, minLength: 10 }
+        imageUrl: { type: string, minLength: 1 }
+        gallery:
+          type: array
+          items: { type: string }
+        bestTimeToVisit: { type: ["string", "null"] }
+        languages:
+          type: array
+          items: { type: string }
+        currencyCode: { type: ["string", "null"] }
+        travelNotes: { type: ["string", "null"] }
+        isFeatured: { type: boolean }
+        isDemo: { type: boolean }
+        isPublished: { type: boolean }
+        sortOrder: { type: integer }
+      required: [slug, name, country, description, imageUrl]
     HomeContent:
       type: object
       properties:
@@ -476,6 +1209,132 @@ components:
         founderBio: { type: string, minLength: 10, maxLength: 5000 }
         founderImageUrl: { type: string, minLength: 1, maxLength: 2048 }
       required: [founderName, founderBio, founderImageUrl]
+    BlogPost:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        content: { type: string }
+        coverImageUrl: { type: string }
+        authorName: { type: string }
+        category: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        isPublished: { type: boolean }
+        createdAt: { type: string, format: date-time }
+      required: [id, slug, title, summary, content, coverImageUrl, authorName, category, tags, isPublished, createdAt]
+    BlogPostInput:
+      type: object
+      properties:
+        slug: { type: string, minLength: 2, maxLength: 120 }
+        title: { type: string, minLength: 3, maxLength: 200 }
+        summary: { type: string, minLength: 10, maxLength: 1000 }
+        content: { type: string, minLength: 20 }
+        coverImageUrl: { type: string, minLength: 1 }
+        authorName: { type: string, minLength: 2 }
+        category: { type: string, minLength: 2 }
+        tags:
+          type: array
+          items: { type: string }
+        isPublished: { type: boolean }
+      required: [slug, title, summary, content, coverImageUrl]
+    GalleryImage:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        location: { type: string }
+        imageUrl: { type: string }
+        category: { type: string }
+        caption: { type: ["string", "null"] }
+        isFeatured: { type: boolean }
+        sortOrder: { type: integer }
+      required: [id, title, location, imageUrl, category, isFeatured, sortOrder]
+    GalleryImageInput:
+      type: object
+      properties:
+        title: { type: string, minLength: 2 }
+        location: { type: string, minLength: 2 }
+        imageUrl: { type: string, minLength: 1 }
+        category: { type: string, minLength: 2 }
+        caption: { type: ["string", "null"] }
+        isFeatured: { type: boolean }
+        sortOrder: { type: integer }
+      required: [title, location, imageUrl, category]
+    FaqItem:
+      type: object
+      properties:
+        id: { type: integer }
+        question: { type: string }
+        answer: { type: string }
+        category: { type: string }
+        sortOrder: { type: integer }
+        isPublished: { type: boolean }
+      required: [id, question, answer, category, sortOrder, isPublished]
+    FaqInput:
+      type: object
+      properties:
+        question: { type: string, minLength: 5 }
+        answer: { type: string, minLength: 5 }
+        category: { type: string, minLength: 2 }
+        sortOrder: { type: integer }
+        isPublished: { type: boolean }
+      required: [question, answer, category]
+    Booking:
+      type: object
+      properties:
+        id: { type: integer }
+        bookingReference: { type: string }
+        tourId: { type: integer }
+        tourTitle: { type: string }
+        destinationName: { type: string }
+        customerName: { type: string }
+        customerEmail: { type: string }
+        customerPhone: { type: ["string", "null"] }
+        travelDate: { type: string }
+        travelers: { type: integer }
+        totalAmount: { type: ["number", "null"] }
+        currency: { type: string }
+        status: { type: string, enum: [pending, confirmed, cancelled] }
+        specialRequests: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+      required: [id, bookingReference, tourId, tourTitle, destinationName, customerName, customerEmail, travelDate, travelers, currency, status, createdAt]
+    BookingInput:
+      type: object
+      properties:
+        tourId: { type: integer }
+        customerName: { type: string, minLength: 2, maxLength: 120 }
+        customerEmail: { type: string, format: email, maxLength: 320 }
+        customerPhone: { type: ["string", "null"], maxLength: 40 }
+        travelDate: { type: string, minLength: 4 }
+        travelers: { type: integer, minimum: 1, maximum: 50 }
+        specialRequests: { type: ["string", "null"], maxLength: 2000 }
+      required: [tourId, customerName, customerEmail, travelDate, travelers]
+    BookingStatusUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [pending, confirmed, cancelled] }
+      required: [status]
+    InquiryItem:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: ["string", "null"] }
+        subject: { type: string }
+        message: { type: string }
+        status: { type: string, enum: [new, in_progress, resolved] }
+        createdAt: { type: string, format: date-time }
+      required: [id, name, email, subject, message, status, createdAt]
+    InquiryStatusUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [new, in_progress, resolved] }
+      required: [status]
     ContactInput:
       type: object
       properties:
@@ -505,4 +1364,3 @@ components:
         updatedAt: { type: string, format: date-time }
         canInitializeAdmin: { type: boolean }
       required: [clerkUserId, role, createdAt, updatedAt, canInitializeAdmin]
-

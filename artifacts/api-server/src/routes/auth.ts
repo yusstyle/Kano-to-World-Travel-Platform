@@ -42,6 +42,22 @@ router.get("/auth/me", async (req, res): Promise<void> => {
     return;
   }
 
+  if (profile.role !== "admin" && process.env.CLERK_SECRET_KEY) {
+    try {
+      const account = await clerkClient.users.getUser(userId);
+      const configuredEmail = (process.env.ADMIN_EMAIL || "yusufhussaini0904@gmail.com").trim().toLowerCase();
+      if (account?.primaryEmailAddress?.emailAddress?.trim().toLowerCase() === configuredEmail) {
+        await db
+          .update(userProfilesTable)
+          .set({ role: "admin", updatedAt: new Date() })
+          .where(eq(userProfilesTable.clerkUserId, userId));
+        profile.role = "admin";
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   const [existingAdmin] = await db
     .select({ clerkUserId: userProfilesTable.clerkUserId })
     .from(userProfilesTable)
@@ -56,6 +72,47 @@ router.get("/auth/me", async (req, res): Promise<void> => {
       ),
     ),
   );
+});
+
+router.post("/auth/admin-login", async (req, res): Promise<void> => {
+  const { email } = req.body ?? {};
+  const configuredEmail = (process.env.ADMIN_EMAIL || "yusufhussaini0904@gmail.com").trim().toLowerCase();
+
+  if (!email || typeof email !== "string" || email.trim().toLowerCase() !== configuredEmail) {
+    res.status(401).json({
+      error: `Invalid email. Administrator access is configured for ${configuredEmail}.`,
+    });
+    return;
+  }
+
+  const adminUserId = "admin_yusufhussaini";
+
+  await db
+    .insert(userProfilesTable)
+    .values({ clerkUserId: adminUserId, role: "admin" })
+    .onConflictDoUpdate({
+      target: userProfilesTable.clerkUserId,
+      set: { role: "admin", updatedAt: new Date() },
+    });
+
+  const token = `admin-token-${adminUserId}`;
+  res.cookie("admin_token", token, {
+    httpOnly: false,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  res.json({
+    token,
+    email: configuredEmail,
+    role: "admin",
+    message: "Administrator session established successfully.",
+  });
+});
+
+router.post("/auth/admin-logout", async (_req, res): Promise<void> => {
+  res.clearCookie("admin_token", { path: "/" });
+  res.json({ success: true, message: "Logged out of administrator portal." });
 });
 
 router.post("/auth/initialize-admin", async (req, res): Promise<void> => {

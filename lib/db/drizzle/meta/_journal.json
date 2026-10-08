@@ -15,6 +15,13 @@
       "when": 1791461338288,
       "tag": "0001_sharp_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791462738199,
+      "tag": "0002_easy_pete_wisdom",
+      "breakpoints": true
     }
   ]
 }
