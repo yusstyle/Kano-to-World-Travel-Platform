@@ -574,9 +574,17 @@ export function handleStaticFallback<T = unknown>(
     }
   }
 
-  // 1. Health check
+  // 1. Health check & Upload
   if (pathname === "/api/health") {
     return { status: "ok" } as T;
+  }
+
+  if (pathname === "/api/admin/upload" && method === "POST") {
+    return {
+      url: body.data || "/kano-editorial.jpg",
+      filename: body.filename || "upload.jpg",
+      size: body.data ? body.data.length : 0,
+    } as T;
   }
 
   // 2. Authentication
@@ -984,3 +992,4 @@ export function handleStaticFallback<T = unknown>(
 
   return undefined;
 }
+

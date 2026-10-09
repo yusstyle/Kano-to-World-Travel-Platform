@@ -950,16 +950,67 @@ interface ImageUploadFieldProps {
   required?: boolean;
 }
 
+async function compressImage(file: File, maxWidth = 1600, maxHeight = 1600, quality = 0.85): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (file.type === 'image/svg+xml' || file.type === 'image/gif') {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > maxWidth || height > maxHeight) {
+        if (width / maxWidth > height / maxHeight) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        } else {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, width);
+      canvas.height = Math.max(1, height);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+      const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const dataUri = canvas.toDataURL(outputType, quality);
+      resolve(dataUri);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    };
+    img.src = objectUrl;
+  });
+}
+
 function ImageUploadField({ label, value, onChange, required = false }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setUploadError('Please select a valid image file (JPEG, PNG, WebP, GIF, SVG).');
       return;
@@ -974,43 +1025,70 @@ function ImageUploadField({ label, value, onChange, required = false }: ImageUpl
     setUploadError('');
 
     try {
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(file);
-      const dataUri = await base64Promise;
+      const dataUri = await compressImage(file);
 
-      const token = localStorage.getItem('admin_token');
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      // Attempt backend upload if API is available
+      let finalUrl = dataUri;
+      try {
+        const token = localStorage.getItem('admin_token');
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            filename: file.name,
+            data: dataUri,
+          }),
+        });
+
+        if (res.ok) {
+          const result = await res.json().catch(() => null);
+          if (result?.url) {
+            finalUrl = result.url;
+          }
+        }
+      } catch {
+        // Fallback directly to the compressed dataUri for static Vercel
       }
 
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          filename: file.name,
-          data: dataUri,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to upload image.');
-      }
-
-      const result = await res.json();
-      onChange(result.url);
+      onChange(finalUrl);
     } catch (err: any) {
-      setUploadError(err.message || 'Error uploading image.');
+      setUploadError(err.message || 'Error processing image.');
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
     }
   };
 
@@ -1041,10 +1119,13 @@ function ImageUploadField({ label, value, onChange, required = false }: ImageUpl
         <div style={{ display: 'grid', gap: 10 }}>
           <div
             onClick={() => fileInputRef.current?.click()}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
             style={{
-              border: '2px dashed #d5c8b6',
-              background: '#fbf9f4',
-              padding: '16px 14px',
+              border: `2px dashed ${isDragging ? '#8a652f' : '#d5c8b6'}`,
+              background: isDragging ? '#f4ece0' : '#fbf9f4',
+              padding: '18px 14px',
               textAlign: 'center',
               cursor: 'pointer',
               borderRadius: 3,
@@ -1052,6 +1133,7 @@ function ImageUploadField({ label, value, onChange, required = false }: ImageUpl
               flexDirection: 'column',
               alignItems: 'center',
               gap: 6,
+              transition: 'all 0.2s ease',
             }}
           >
             <input
@@ -1061,14 +1143,14 @@ function ImageUploadField({ label, value, onChange, required = false }: ImageUpl
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
-            <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#ede3d3', display: 'grid', placeItems: 'center', color: '#8a652f' }}>
-              <Upload size={16} />
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ede3d3', display: 'grid', placeItems: 'center', color: '#8a652f' }}>
+              <Upload size={17} />
             </div>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#28231e' }}>
-              {uploading ? 'Uploading image to server…' : 'Choose image to upload from your computer'}
+              {uploading ? 'Processing image…' : 'Choose or drop image to upload'}
             </p>
             <p style={{ margin: 0, fontSize: 11, color: '#7a7063' }}>
-              Supports JPG, PNG, WebP, GIF, SVG (up to 25MB)
+              Supports JPG, PNG, WebP, GIF, SVG (automatic web optimization)
             </p>
           </div>
 
