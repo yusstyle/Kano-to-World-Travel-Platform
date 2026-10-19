@@ -28,7 +28,7 @@ const DEFAULT_SITE_CONTENT: SiteContent = {
   founderName: "A Kano-based professional working in culture and history",
   founderBio:
     "A Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage.",
-  founderImageUrl: "/kano-editorial.jpg",
+  founderImageUrl: "/founder.jpg",
 };
 
 const DEFAULT_DESTINATIONS: DestinationDetail[] = [
@@ -530,7 +530,12 @@ function getStorage<T>(key: string, defaultValue: T): T {
       localStorage.setItem(key, JSON.stringify(defaultValue));
       return defaultValue;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (key === STORAGE_KEYS.SITE_CONTENT && (!parsed?.founderImageUrl || parsed.founderImageUrl === "/kano-editorial.jpg")) {
+      parsed.founderImageUrl = "/founder.jpg";
+      localStorage.setItem(key, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch {
     return defaultValue;
   }

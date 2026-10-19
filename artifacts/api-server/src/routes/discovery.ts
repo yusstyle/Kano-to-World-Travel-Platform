@@ -98,7 +98,7 @@ router.get("/home", async (_req, res): Promise<void> => {
     founderName: "A Kano-based professional working in culture and history",
     founderBio:
       "A Kano-based professional working in culture and history, with experience at Kano Museum sharing Kano’s history and heritage.",
-    founderImageUrl: "/kano-editorial.jpg",
+    founderImageUrl: "/founder.jpg",
   };
 
   res.json(
