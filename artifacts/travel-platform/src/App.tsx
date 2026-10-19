@@ -127,7 +127,7 @@ function Header() {
         <Link href="/contact" className="btn-dark" data-testid="link-contact-nav" onClick={() => setOpen(false)} style={{ padding: '10px 15px', fontSize: 12 }}>Make an enquiry <ArrowRight size={14}/></Link>
       </nav>
     </div>
-    <span aria-hidden="true" data-testid="status-discovery-service" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}>{health.isError ? 'Discovery service unavailable' : 'Discovery service'}</span>
+    <span aria-hidden="true" data-testid="status-discovery-service" style={{ display: 'none' }}>Discovery service</span>
   </header>;
 }
 
@@ -544,7 +544,7 @@ function HomeRedirect() {
 }
 
 function AdminRoute() {
-  return <Shell><AdminPage /></Shell>;
+  return <AdminPage />;
 }
 
 function AccountRoute() {
