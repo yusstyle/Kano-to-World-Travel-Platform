@@ -21,7 +21,7 @@ export default function GalleryPage() {
             Photographic Notes on Place & Living Culture.
           </h1>
           <p style={{ fontSize: 16, lineHeight: 1.8, color: '#6e655a', maxWidth: 660 }}>
-            Visual impressions from Kano, ancient ramparts, master dye pits, desert oasis towns, and cultural crossroads.
+            Visual impressions from ancient ramparts and Sahara dunes to Mediterranean medinas, Ottoman domes, Swahili spice shores, and African safari wilderness.
           </p>
         </div>
       </section>

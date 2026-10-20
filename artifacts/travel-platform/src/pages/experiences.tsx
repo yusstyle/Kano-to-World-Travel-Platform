@@ -34,6 +34,22 @@ const experiences = [
     category: 'Food & Cuisine',
     tags: ['Kurmi Market', 'Sahelian Spices', 'Traditional Tea Rituals', 'Local Markets'],
   },
+  {
+    title: 'Savanna Wildlife & Great Migrations',
+    eyebrow: 'Untamed African Ecosystems',
+    desc: 'Witness the majestic rhythms of the African wild across the Maasai Mara and Serengeti plains, guided by expert indigenous naturalists.',
+    image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80',
+    category: 'Wildlife & Safari',
+    tags: ['Big Five Safaris', 'Great Migration', 'Serengeti Sunrise', 'Indigenous Trackers'],
+  },
+  {
+    title: 'Coastal Swahili & Island Havens',
+    eyebrow: 'Oceanic Trade & Island Life',
+    desc: 'Unwind along turquoise coral shores, historic dhow shipyards, and UNESCO Stone Town spice labyrinths bathed in Indian Ocean sea breeze.',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    category: 'Coastal & Island Retreats',
+    tags: ['Stone Town', 'Spice Plantations', 'Coral Reef Dhows', 'Indian Ocean'],
+  },
 ];
 
 export default function ExperiencesPage() {
